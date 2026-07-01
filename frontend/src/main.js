@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import App from "./App.vue";
+import App from "./app/App.vue";
 import PrimeVue from "primevue/config";
 import "primeicons/primeicons.css";
 import Aura from "@primeuix/themes/aura";
@@ -22,7 +22,7 @@ app.use(PrimeVue, {
     preset: Aura,
     options: {
       prefix: "p",
-      darkModeSelector: "false",
+      darkModeSelector: ".dark",
       cssLayer: false,
     },
   },

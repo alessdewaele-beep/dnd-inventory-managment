@@ -1,10 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* Globaal font voor hele project */
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui;
+  --font-serif: "Cinzel", ui-serif, Georgia, serif;
+
+  --color-parchment: #f5f1e6;
+  --color-parchment-dark: #1e1e1e;
+  --color-ink: #2e2a26;
+  --color-ink-light: #f5f5f5;
+  --color-gold: #d9b44a;
+  --color-gold-deep: #b8860b;
+  --color-arcane: #7a3e9d;
+  --color-arcane-light: #9b5fc0;
+  --color-forest: #355e3b;
+  --color-forest-light: #4b7a57;
+  --color-ember: #c97c5d;
+  --color-blood: #b22222;
+  --color-panel: #ede6d6;
+  --color-panel-dark: #2e2a26;
+}
+
 html,
 body {
-  font-family: "Roboto", ui-sans-serif, system-ui;
+  font-family: var(--font-sans);
 }

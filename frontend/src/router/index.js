@@ -1,22 +1,19 @@
-import {
-  createRouter,
-  createWebHistory,
-  createWebHashHistory,
-} from "vue-router";
-import { useAuth } from "@/composables/useAuth";
-import mainPage from "@/pages/InventoryPage.vue";
-import registerPage from "@/pages/RegisterPage.vue";
-import LoginPage from "@/pages/LoginPage.vue";
-import newCampaign from "@/pages/newCampaign.vue";
+import { createRouter, createWebHashHistory } from "vue-router";
+import { authService } from "@/shared/services/domain/authService";
+import { useRightManager } from "@/shared/composables/useRightManager";
+import InventoryPage from "@/features/inventory/pages/InventoryPage.vue";
+import RegisterPage from "@/features/auth/pages/RegisterPage.vue";
+import LoginPage from "@/features/auth/pages/LoginPage.vue";
+import AdminPanelPage from "@/features/adminPanel/pages/AdminPanelPage.vue";
 
 const routes = [
   { path: "/", name: "start", component: LoginPage },
-  { path: "/home", name: "Home", component: mainPage },
-  { path: "/register", name: "Register", component: registerPage },
+  { path: "/home", name: "Home", component: InventoryPage },
+  { path: "/register", name: "Register", component: RegisterPage },
   {
     path: "/newCampaign",
     name: "newCampaign",
-    component: newCampaign,
+    component: AdminPanelPage,
     meta: { requiresAuth: true, requiredRole: "Admin" },
   },
 ];
@@ -27,17 +24,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const { isLoggedIn, getRole } = useAuth();
+  const { hasRight } = useRightManager();
 
-  if (to.meta.requiresAuth && !isLoggedIn()) {
+  if (to.meta.requiresAuth && !authService.isLoggedIn()) {
     return next("/");
   }
 
-  if (to.meta.requiredRole) {
-    const userRole = getRole();
-    if (userRole !== to.meta.requiredRole) {
-      return next("/home");
-    }
+  if (to.meta.requiredRole && !hasRight(to.meta.requiredRole)) {
+    return next("/home");
   }
 
   next();
