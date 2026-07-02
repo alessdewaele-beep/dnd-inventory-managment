@@ -8,6 +8,15 @@ router.post("/login", userController.login.bind(userController));
 
 router.get("/profile", authenticate, userController.profile.bind(userController));
 
+// Self-service profiel: eigen gegevens ophalen en aanpassen.
+router.get("/me", authenticate, userController.me.bind(userController));
+router.patch("/me", authenticate, userController.updateMe.bind(userController));
+router.patch(
+  "/me/password",
+  authenticate,
+  userController.changePassword.bind(userController)
+);
+
 router.get(
   "/my-campaign-players",
   authenticate,

@@ -1,14 +1,24 @@
 <script setup>
+import { onMounted } from "vue";
 import { authService } from "@/shared/services/domain/authService";
+import { profileService } from "@/shared/services/domain/profileService";
 import { useRightManager } from "@/shared/composables/useRightManager";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import { useTheme } from "@/shared/composables/useTheme";
 
 const { hasRight } = useRightManager();
-const { goIfAllowed, goLogin } = useNavigation();
+const { goIfAllowed, goLogin, goTo } = useNavigation();
 const { isDark, toggleTheme } = useTheme();
 
+// Laadt het profiel (voor de campagne-context) zodra iemand ingelogd is.
+onMounted(() => {
+  if (authService.isLoggedIn()) {
+    profileService.fetchMe();
+  }
+});
+
 const logOutAction = () => {
+  profileService.clear();
   authService.logout();
   goLogin();
 };
@@ -32,6 +42,18 @@ const logOutAction = () => {
       </h1>
     </div>
 
+    <!-- Campagne-context: enkel voor spelers/DM's met een gekoppelde campagne -->
+    <div
+      v-if="authService.isLoggedIn() && profileService.state.me?.campaign_name"
+      class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold bg-gold/10 text-ink dark:text-ink-light shrink-0"
+      title="Huidige campagne"
+    >
+      <i class="pi pi-map text-gold"></i>
+      <span class="text-sm font-medium truncate max-w-[16rem]">
+        {{ profileService.state.me.campaign_name }}
+      </span>
+    </div>
+
     <!-- Rechts: acties / user info / auth -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <p-button
@@ -51,12 +73,18 @@ const logOutAction = () => {
         <i :class="isDark ? 'pi pi-sun' : 'pi pi-moon'"></i>
       </button>
 
-      <span
+      <button
         v-if="authService.isLoggedIn()"
-        class="hidden sm:inline text-forest dark:text-forest-light font-medium text-sm"
+        type="button"
+        @click="goTo('/profile')"
+        title="Naar mijn profiel"
+        class="flex items-center gap-2 text-forest dark:text-forest-light font-medium text-sm hover:underline cursor-pointer"
       >
-        {{ authService.getUsername() }} · {{ authService.getRole() }}
-      </span>
+        <i class="pi pi-user"></i>
+        <span class="hidden sm:inline">
+          {{ authService.getUsername() }} · {{ authService.getRole() }}
+        </span>
+      </button>
 
       <button
         v-if="authService.isLoggedIn()"

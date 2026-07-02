@@ -40,6 +40,19 @@ export default class ApiRepository extends DnDRepository {
     return Client.get("/users");
   }
 
+  // --- Self-service profiel ---
+  async getMe() {
+    return Client.getAll("users/me");
+  }
+
+  async updateProfile(data) {
+    return Client.patch("users/me", null, data);
+  }
+
+  async changePassword(data) {
+    return Client.patch("users/me/password", null, data);
+  }
+
   async getPublicCampaigns() {
     return Client.getAll("campaigns/public");
   }

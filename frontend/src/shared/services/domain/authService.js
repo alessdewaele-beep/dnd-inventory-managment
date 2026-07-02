@@ -30,6 +30,10 @@ function getUserFromToken() {
   }
 }
 
+function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
 function logout() {
   localStorage.removeItem(TOKEN_KEY);
 }
@@ -97,6 +101,7 @@ export const authService = {
   register,
   logout,
   getToken,
+  setToken,
   isLoggedIn,
   getUserId,
   getUsername,

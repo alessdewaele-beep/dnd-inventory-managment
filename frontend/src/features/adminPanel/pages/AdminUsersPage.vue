@@ -61,7 +61,6 @@ async function copyPassword() {
     await navigator.clipboard.writeText(resetDialog.value.password);
     toast.add({ severity: "success", summary: "Gekopieerd", life: 2000 });
   } catch {
-    // Klembord niet beschikbaar; gebruiker kan handmatig kopiëren.
   }
 }
 

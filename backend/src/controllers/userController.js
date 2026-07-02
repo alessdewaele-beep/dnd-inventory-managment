@@ -30,6 +30,40 @@ class UserController {
     });
   }
 
+  // Eigen profiel incl. campagne-naam en backstory (leest de DB, i.t.t. /profile).
+  async me(req, res) {
+    try {
+      const profile = await service.getMe(req.user.id);
+      if (!profile)
+        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+      res.json(profile);
+    } catch (err) {
+      res.status(err.status || 400).json({ error: err.message });
+    }
+  }
+
+  // Self-service: eigen username en/of backstory aanpassen.
+  // Bij een username-wijziging komt er een verse token mee terug.
+  async updateMe(req, res) {
+    try {
+      const result = await service.updateSelf(req.user, req.body);
+      res.json(result);
+    } catch (err) {
+      res.status(err.status || 400).json({ error: err.message });
+    }
+  }
+
+  // Self-service: wachtwoord wijzigen (huidig wachtwoord vereist).
+  async changePassword(req, res) {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      await service.changePassword(req.user.id, currentPassword, newPassword);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(err.status || 400).json({ error: err.message });
+    }
+  }
+
   async getAll(req, res) {
     try {
       const users = await service.getAll();

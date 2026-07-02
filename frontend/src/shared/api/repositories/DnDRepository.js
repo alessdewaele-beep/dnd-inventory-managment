@@ -34,6 +34,19 @@ export default class DnDRepository {
     throw new Error("method not implemented");
   }
 
+  // --- Self-service profiel ---
+  getMe() {
+    throw new Error("method not implemented");
+  }
+
+  updateProfile(data) {
+    throw new Error("method not implemented", data);
+  }
+
+  changePassword(data) {
+    throw new Error("method not implemented", data);
+  }
+
   getPublicCampaigns() {
     throw new Error("method not implemented");
   }
