@@ -25,3 +25,108 @@ html,
 body {
   font-family: var(--font-sans);
 }
+
+/* Fantasy-themed skin over PrimeVue's Dialog, in dezelfde stijl als de
+   DataTable: gouden rand, ink-header met gouden serif-titel en een
+   parchment (light) vs tavern (dark) body die meevolgt met .dark.
+   Gedeeld door o.a. ItemFormDialog en ConfirmDialog. */
+.my-dialog {
+  --dl-bg: #f5f1e6;
+  --dl-fg: #2e2a26;
+  --dl-header-bg: #2e2a26;
+  --dl-header-fg: #d9b44a;
+
+  border: 2px solid #d9b44a;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35);
+}
+
+.dark .my-dialog {
+  --dl-bg: #2e2a26;
+  --dl-fg: #f5f5f5;
+  --dl-header-bg: #1b1b1b;
+  --dl-header-fg: #d4af37;
+}
+
+.my-dialog .p-dialog-header {
+  background-color: var(--dl-header-bg);
+  color: var(--dl-header-fg);
+  letter-spacing: 0.03em;
+  padding: 0.9rem 1.25rem;
+}
+
+.my-dialog .p-dialog-header .p-dialog-header-actions .p-dialog-header-icon {
+  color: var(--dl-header-fg);
+}
+
+.my-dialog .p-dialog-content {
+  background-color: var(--dl-bg);
+  color: var(--dl-fg);
+  padding: 1.25rem;
+}
+
+.my-dialog label {
+  color: var(--dl-fg);
+}
+
+/* Inputs binnen de dialog krijgen een subtiele gouden focus-rand */
+.my-dialog .p-inputtext:focus,
+.my-dialog .p-select:not(.p-disabled).p-focus,
+.my-dialog .p-inputnumber-input:focus {
+  border-color: #d9b44a;
+  box-shadow: 0 0 0 1px #d9b44a;
+}
+
+/* Primaire knop (Add/Update/Delete) in de blood-huisstijl, net als "Add Item" */
+.my-dialog .dt-primary-btn,
+.my-confirmpopup .dt-primary-btn {
+  background-color: #b22222;
+  border-color: #b22222;
+  color: #f5f5f5;
+}
+
+.my-dialog .dt-primary-btn:hover,
+.my-confirmpopup .dt-primary-btn:hover {
+  filter: brightness(1.1);
+  background-color: #b22222;
+  border-color: #b22222;
+}
+
+/* Fantasy-skin voor de ConfirmPopup, in lijn met de dialog: gouden rand,
+   parchment (light) vs tavern (dark) achtergrond en gouden waarschuwingsicoon. */
+.my-confirmpopup {
+  --cp-bg: #f5f1e6;
+  --cp-fg: #2e2a26;
+
+  border: 2px solid #d9b44a;
+  border-radius: 0.75rem;
+  background-color: var(--cp-bg);
+  color: var(--cp-fg);
+  box-shadow: 0 12px 20px -6px rgba(0, 0, 0, 0.35);
+}
+
+.dark .my-confirmpopup {
+  --cp-bg: #2e2a26;
+  --cp-fg: #f5f5f5;
+}
+
+.my-confirmpopup .p-confirmpopup-content {
+  background-color: var(--cp-bg);
+  color: var(--cp-fg);
+  font-family: var(--font-serif);
+}
+
+.my-confirmpopup .p-confirmpopup-icon {
+  color: #d9b44a;
+}
+
+.my-confirmpopup .p-confirmpopup-footer {
+  background-color: var(--cp-bg);
+}
+
+/* De pijl van de popup mee inkleuren met de parchment/tavern achtergrond */
+.my-confirmpopup:before,
+.my-confirmpopup:after {
+  border-bottom-color: #d9b44a;
+}

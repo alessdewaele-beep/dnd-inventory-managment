@@ -30,23 +30,23 @@ const save = () => emit("save");
     :visible="props.visible"
     @update:visible="(value) => emit('update:visible', value)"
     modal
-    class="w-full max-w-[600px] mx-4"
+    class="my-dialog w-full max-w-[600px] mx-4"
   >
     <template #header>
-      <span class="font-serif text-lg flex items-center gap-2 text-ink dark:text-ink-light">
-        <i class="pi pi-sparkles text-gold"></i>
+      <span class="font-serif text-lg flex items-center gap-2">
+        <i class="pi pi-sparkles"></i>
         {{ item.id ? "Edit item" : "Add item" }}
       </span>
     </template>
 
     <div class="flex flex-col gap-4 pt-2">
       <div class="flex flex-col gap-1">
-        <label for="name" class="text-sm font-medium text-ink dark:text-ink-light">Name</label>
+        <label for="name" class="text-sm font-medium">Name</label>
         <p-inputText id="name" v-model="item.name" placeholder="Enter name" />
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="description" class="text-sm font-medium text-ink dark:text-ink-light">Description</label>
+        <label for="description" class="text-sm font-medium">Description</label>
         <p-textarea
           v-model="item.description"
           autoResize
@@ -56,7 +56,7 @@ const save = () => emit("save");
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="type" class="text-sm font-medium text-ink dark:text-ink-light">Type</label>
+        <label for="type" class="text-sm font-medium">Type</label>
         <p-select
           id="type"
           v-model="item.type"
@@ -69,7 +69,7 @@ const save = () => emit("save");
       </div>
 
       <div class="flex flex-col gap-1">
-        <label for="quantity" class="text-sm font-medium text-ink dark:text-ink-light">Quantity</label>
+        <label for="quantity" class="text-sm font-medium">Quantity</label>
         <p-inputnumber v-model="item.quantity" placeholder="Enter quantity" class="w-full" />
       </div>
 
@@ -79,9 +79,16 @@ const save = () => emit("save");
           v-if="!item.id"
           label="Add"
           icon="pi pi-check"
+          class="dt-primary-btn"
           @click="save"
         />
-        <p-button v-else label="Update" icon="pi pi-check" @click="save" />
+        <p-button
+          v-else
+          label="Update"
+          icon="pi pi-check"
+          class="dt-primary-btn"
+          @click="save"
+        />
       </div>
     </div>
   </p-dialog>

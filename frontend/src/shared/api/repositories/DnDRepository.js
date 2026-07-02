@@ -25,4 +25,8 @@ export default class DnDRepository {
   getAllUsers() {
     throw new Error("method not implemented");
   }
+
+  getPublicCampaigns() {
+    throw new Error("method not implemented");
+  }
 }

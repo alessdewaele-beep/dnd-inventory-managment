@@ -29,4 +29,8 @@ export default class ApiRepository extends DnDRepository {
   async getAllUsers() {
     return Client.get("/users");
   }
+
+  async getPublicCampaigns() {
+    return Client.getAll("campaigns/public");
+  }
 }

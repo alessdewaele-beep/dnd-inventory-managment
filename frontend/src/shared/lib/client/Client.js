@@ -16,11 +16,13 @@ const ClientHelper = {
 
   async callAPI(relativePath, method = "GET", id = null, dataObject = null) {
     const url = ClientHelper.getFullURI(relativePath, id);
+    const token = localStorage.getItem("JWT_token");
 
     const options = {
       method,
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     };
 
@@ -43,6 +45,13 @@ const ClientHelper = {
     }
 
     if (!res.ok) {
+      // Alleen wanneer er ook echt een token werd meegestuurd betekent 401
+      // "sessie verlopen/ongeldig". Zonder token (bv. mislukte login) laten
+      // we de aanroeper zelf de fout afhandelen.
+      if (res.status === 401 && token) {
+        localStorage.removeItem("JWT_token");
+        window.location.hash = "#/";
+      }
       throw new HTTPError(url, res.status, data);
     }
 

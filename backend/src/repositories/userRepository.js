@@ -6,10 +6,14 @@ class UserRepository {
     const hash = await bcrypt.hash(user.password, 10);
     const role = user.role || "Player";
     const [result] = await pool.query(
-      "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-      [user.username, hash, role]
+      "INSERT INTO users (username, password_hash, role, campaign_id) VALUES (?, ?, ?, ?)",
+      [user.username, hash, role, user.campaignId]
     );
-    return { id: result.insertId, username: user.username };
+    return {
+      id: result.insertId,
+      username: user.username,
+      campaignId: user.campaignId,
+    };
   }
 
   async findByUsername(username) {
@@ -17,6 +21,19 @@ class UserRepository {
       username,
     ]);
     return rows[0];
+  }
+
+  async findById(id) {
+    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
+    return rows[0];
+  }
+
+  async getByCampaignId(campaignId) {
+    const [rows] = await pool.query(
+      "SELECT id, username, role, campaign_id FROM users WHERE campaign_id = ?",
+      [campaignId]
+    );
+    return rows;
   }
 
   async getAll() {

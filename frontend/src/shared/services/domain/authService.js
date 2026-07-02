@@ -78,10 +78,12 @@ async function login(username, password) {
   }
 }
 
-async function register(username, password) {
+async function register(username, password, campaignId) {
   state.errorMessage = "";
   try {
-    await registerUseCase.execute(new User(username, password));
+    const user = new User(username, password);
+    user.campaignId = campaignId;
+    await registerUseCase.execute(user);
     return true;
   } catch (err) {
     state.errorMessage = err.message || "Register failed, try again.";

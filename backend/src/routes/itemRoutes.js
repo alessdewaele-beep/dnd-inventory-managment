@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const itemController = require("../controllers/itemController");
+const { authenticate } = require("../middleware/auth");
+
+// Alle item-routes vereisen een geldige token.
+router.use(authenticate);
 
 router.get("/", itemController.getAll.bind(itemController));
 router.get("/:id", itemController.getById.bind(itemController));

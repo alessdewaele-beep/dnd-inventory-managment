@@ -40,5 +40,17 @@ services:
     ports:
       - "8030:80"
 
+  # phpMyAdmin for the production Aiven MySQL instance. Host/port/SSL CA
+  # are read from backend/.env (see aiven-phpmyadmin/config.user.inc.php).
+  # Log in with the DB_USER / DB_PASSWORD from that same file.
+  phpmyadmin-aiven:
+    image: phpmyadmin/phpmyadmin
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./aiven-phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    ports:
+      - "8031:80"
+
 volumes:
   db_data:

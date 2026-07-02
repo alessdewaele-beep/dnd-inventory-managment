@@ -13,8 +13,11 @@ class ItemController {
   }
 
   async getByUserId(req, res) {
-    console.log("userId", req.body);
-    const items = await itemService.getItemByUserId(Number(req.params.userId));
+    const userId = Number(req.params.userId);
+    const allowed = await itemService.canViewInventory(req.user, userId);
+    if (!allowed) return res.status(403).json({ error: "Onvoldoende rechten" });
+
+    const items = await itemService.getItemByUserId(userId);
     if (!items) return res.status(404).json({ message: "Items not found" });
     res.json(items);
   }

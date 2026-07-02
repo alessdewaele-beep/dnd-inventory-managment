@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 import App from "./app/App.vue";
 import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
+import ConfirmPopup from "primevue/confirmpopup";
 import "primeicons/primeicons.css";
 import Aura from "@primeuix/themes/aura";
 import DataTable from "primevue/datatable";
@@ -27,6 +29,8 @@ app.use(PrimeVue, {
     },
   },
 });
+app.use(ConfirmationService);
+app.component("p-confirmpopup", ConfirmPopup);
 app.component("p-datatable", DataTable);
 app.component("p-column", Column);
 app.component("p-button", Button);

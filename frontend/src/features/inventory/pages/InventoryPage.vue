@@ -9,9 +9,11 @@ import { useRightManager } from "@/shared/composables/useRightManager";
 import AppNavbar from "@/shared/components/AppNavbar.vue";
 import ItemsTable from "@/features/inventory/components/ItemsTable.vue";
 import ItemFormDialog from "@/features/inventory/components/ItemFormDialog.vue";
+import { useConfirm } from "primevue/useconfirm";
 
 const { goLogin } = useNavigation();
 const { hasRight } = useRightManager();
+const confirm = useConfirm();
 
 const userId = ref();
 const selectedUser = ref("");
@@ -59,7 +61,16 @@ const saveItem = async () => {
   closeDialog();
 };
 
-const deleteItem = (item) => itemsService.deleteItem(item, userId.value);
+const deleteItem = (item, event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: `Delete "${item.name}"?`,
+    icon: "pi pi-exclamation-triangle",
+    rejectProps: { label: "Cancel", severity: "secondary", size: "small" },
+    acceptProps: { label: "Delete", icon: "pi pi-trash", size: "small", class: "dt-primary-btn" },
+    accept: () => itemsService.deleteItem(item, userId.value),
+  });
+};
 const toggleFavourite = (item) => itemsService.toggleFavourite(item);
 const selectFilterWord = (filterWord) =>
   itemsService.selectFilterWord(filterWord);
@@ -85,7 +96,7 @@ onMounted(async () => {
   <AppNavbar />
   <div
     v-if="hasRight('DM')"
-    class="flex items-center gap-3 max-w-4xl mx-auto px-4 pt-4 text-ink dark:text-ink-light"
+    class="flex items-center gap-3 max-w-6xl mx-auto px-4 pt-4 text-ink dark:text-ink-light"
   >
     <label class="text-sm font-medium">Select user to look at their inventory:</label>
     <p-select
@@ -97,7 +108,7 @@ onMounted(async () => {
     ></p-select>
   </div>
 
-  <div class="max-w-4xl mx-auto px-4 pt-5 pb-10">
+  <div class="max-w-6xl mx-auto px-4 pt-5 pb-10">
     <ItemsTable
       :items="itemsService.state.filteredItems"
       :filters="filters"

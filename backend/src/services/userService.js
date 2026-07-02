@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
-const JWT_SECRET = process.env.JWT_SECRET; // in productie: .env
+const campaignRepository = require("../repositories/campaignRepository");
+const { JWT_SECRET, JWT_EXPIRES_IN } = require("../config");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
 class UserService {
   async register(user) {
-    if (!user.username || !user.password) {
+    if (!user.username || !user.password || !user.campaignId) {
       throw new Error("Alle velden zijn verplicht");
     }
     try {
@@ -29,10 +30,10 @@ class UserService {
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
-      "supermegasterkesecret",
-      { expiresIn: "1h" }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
     );
-    return { token, id: user.id, username: user.username };
+    return { token, id: user.id, username: user.username, role: user.role };
   }
 
   async getAll() {
@@ -47,6 +48,19 @@ class UserService {
     } catch (err) {
       throw err;
     }
+  }
+
+  // Mag `requester` de spelers van deze campaign opvragen?
+  // Toegestaan voor de Admin en de DM van die campaign.
+  async canViewCampaignPlayers(requester, campaignId) {
+    if (requester.role === "Admin") return true;
+    const campaign = await campaignRepository.getById(campaignId);
+    return !!campaign && campaign.dungeon_master_id === requester.id;
+  }
+
+  async getPlayersByCampaign(campaignId) {
+    const rows = await userRepository.getByCampaignId(campaignId);
+    return rows.map((user) => new User(user.username, user.id, user.role));
   }
 }
 

@@ -1,15 +1,21 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { authService } from "@/shared/services/domain/authService";
+import { campaignsService } from "@/shared/services/domain/campaignsService";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import AppNavbar from "@/shared/components/AppNavbar.vue";
 
 const username = ref("");
 const password = ref("");
 const passwordCheck = ref("");
+const campaignId = ref("");
 const errorMessage = ref("");
 
 const { goLogin } = useNavigation();
+
+onMounted(() => {
+  campaignsService.fetchPublicCampaigns();
+});
 
 const registerUser = async () => {
   errorMessage.value = "";
@@ -19,12 +25,21 @@ const registerUser = async () => {
     return;
   }
 
+  if (!campaignId.value) {
+    errorMessage.value = "Please select a campaign";
+    return;
+  }
+
   if (password.value !== passwordCheck.value) {
     errorMessage.value = "Passwords don't match.";
     return;
   }
 
-  const success = await authService.register(username.value, password.value);
+  const success = await authService.register(
+    username.value,
+    password.value,
+    Number(campaignId.value)
+  );
   if (success) {
     goLogin();
   } else {
@@ -71,6 +86,20 @@ const registerUser = async () => {
           placeholder="Confirm password"
           class="p-3 rounded-lg border focus:outline-none focus:ring-2 border-gold bg-white text-ink focus:ring-arcane dark:border-gold-deep dark:text-ink-light dark:bg-white/5 dark:focus:ring-gold"
         />
+
+        <select
+          v-model="campaignId"
+          class="p-3 rounded-lg border focus:outline-none focus:ring-2 border-gold bg-white text-ink focus:ring-arcane dark:border-gold-deep dark:text-ink-light dark:bg-white/5 dark:focus:ring-gold"
+        >
+          <option value="" disabled>Select a campaign</option>
+          <option
+            v-for="campaign in campaignsService.state.campaigns"
+            :key="campaign.id"
+            :value="campaign.id"
+          >
+            {{ campaign.name }}
+          </option>
+        </select>
 
         <p
           v-if="errorMessage"

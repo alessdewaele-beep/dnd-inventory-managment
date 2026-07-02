@@ -8,7 +8,12 @@ import AdminPanelPage from "@/features/adminPanel/pages/AdminPanelPage.vue";
 
 const routes = [
   { path: "/", name: "start", component: LoginPage },
-  { path: "/home", name: "Home", component: InventoryPage },
+  {
+    path: "/home",
+    name: "Home",
+    component: InventoryPage,
+    meta: { requiresAuth: true },
+  },
   { path: "/register", name: "Register", component: RegisterPage },
   {
     path: "/newCampaign",
