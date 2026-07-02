@@ -90,6 +90,7 @@ onMounted(() => {
       {{ usersService.state.errorMessage }}
     </p>
 
+    <div class="rounded-xl overflow-hidden border-2 border-gold shadow-xl w-full">
     <p-datatable
       :value="usersService.state.adminUsers"
       :filters="filters"
@@ -98,15 +99,21 @@ onMounted(() => {
       :rows="10"
       :rows-per-page-options="[10, 25, 50]"
       removable-sort
+      stripedRows
+      scrollable
       data-key="id"
       class="my-datatable"
     >
       <template #header>
-        <div class="flex justify-end">
-          <p-iconField>
-            <p-inputIcon class="pi pi-search" />
-            <p-inputText v-model="filters.global.value" placeholder="Zoeken…" />
-          </p-iconField>
+        <div class="flex items-center justify-end px-4 py-3 bg-ink text-gold dark:bg-black/40">
+          <div class="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 w-full sm:w-auto sm:min-w-[16rem]">
+            <i class="pi pi-search text-blood shrink-0"></i>
+            <p-inputText
+              v-model="filters.global.value"
+              placeholder="Zoeken…"
+              class="!bg-transparent !border-none !text-ink-light !outline-none w-full"
+            />
+          </div>
         </div>
       </template>
 
@@ -114,22 +121,22 @@ onMounted(() => {
         <div class="py-6 text-center opacity-60">Geen gebruikers gevonden.</div>
       </template>
 
-      <p-column field="id" header="ID" sortable style="width: 5rem" />
-      <p-column field="username" header="Gebruikersnaam" sortable />
-      <p-column field="role" header="Rol" sortable>
+      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem" />
+      <p-column field="username" header="Gebruikersnaam" sortable headerClass="dt-col-left" style="min-width: 10rem" />
+      <p-column field="role" header="Rol" sortable style="min-width: 7rem">
         <template #body="{ data }">
           <p-tag :value="data.role" :severity="roleSeverity(data.role)" />
         </template>
       </p-column>
-      <p-column header="Campagne">
+      <p-column header="Campagne" headerClass="dt-col-left" style="min-width: 9rem">
         <template #body="{ data }">
           <span>{{ data.campaign_id ? (campaignMap[data.campaign_id] || `#${data.campaign_id}`) : "—" }}</span>
         </template>
       </p-column>
-      <p-column field="created_at" header="Aangemaakt" sortable>
+      <p-column field="created_at" header="Aangemaakt" sortable style="min-width: 8rem">
         <template #body="{ data }">{{ formatDate(data.created_at) }}</template>
       </p-column>
-      <p-column header="Acties" style="width: 12rem">
+      <p-column header="Acties" style="width: 8rem; min-width: 8rem">
         <template #body="{ data }">
           <div class="flex gap-2">
             <p-button
@@ -150,6 +157,7 @@ onMounted(() => {
         </template>
       </p-column>
     </p-datatable>
+    </div>
 
     <!-- Tijdelijk wachtwoord na reset -->
     <p-dialog

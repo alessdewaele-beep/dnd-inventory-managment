@@ -72,6 +72,15 @@ class UserController {
     }
   }
 
+  async getMyCampaignPlayers(req, res) {
+    try {
+      const players = await service.getMyCampaignPlayers(req.user);
+      res.json(players);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
   async getByCampaign(req, res) {
     try {
       const campaignId = Number(req.params.campaignId);

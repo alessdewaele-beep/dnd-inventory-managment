@@ -143,6 +143,7 @@ onMounted(() => {
       {{ campaignsService.state.errorMessage }}
     </p>
 
+    <div class="rounded-xl overflow-hidden border-2 border-gold shadow-xl w-full">
     <p-datatable
       :value="campaignsService.state.allCampaigns"
       :filters="filters"
@@ -150,15 +151,21 @@ onMounted(() => {
       paginator
       :rows="10"
       removable-sort
+      stripedRows
+      scrollable
       data-key="id"
       class="my-datatable"
     >
       <template #header>
-        <div class="flex justify-end">
-          <p-iconField>
-            <p-inputIcon class="pi pi-search" />
-            <p-inputText v-model="filters.global.value" placeholder="Zoeken…" />
-          </p-iconField>
+        <div class="flex items-center justify-end px-4 py-3 bg-ink text-gold dark:bg-black/40">
+          <div class="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 w-full sm:w-auto sm:min-w-[16rem]">
+            <i class="pi pi-search text-blood shrink-0"></i>
+            <p-inputText
+              v-model="filters.global.value"
+              placeholder="Zoeken…"
+              class="!bg-transparent !border-none !text-ink-light !outline-none w-full"
+            />
+          </div>
         </div>
       </template>
 
@@ -166,14 +173,14 @@ onMounted(() => {
         <div class="py-6 text-center opacity-60">Geen campagnes gevonden.</div>
       </template>
 
-      <p-column field="id" header="ID" sortable style="width: 5rem" />
-      <p-column field="name" header="Naam" sortable />
-      <p-column field="description" header="Beschrijving">
+      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem" />
+      <p-column field="name" header="Naam" sortable headerClass="dt-col-left" style="min-width: 9rem" />
+      <p-column field="description" header="Beschrijving" headerClass="dt-col-left" style="min-width: 12rem">
         <template #body="{ data }">
           <span class="opacity-80 line-clamp-2">{{ data.description || "—" }}</span>
         </template>
       </p-column>
-      <p-column header="Dungeon master">
+      <p-column header="Dungeon master" headerClass="dt-col-left" style="min-width: 10rem">
         <template #body="{ data }">
           <span v-if="data.dungeon_master" class="flex items-center gap-2">
             <i class="pi pi-user opacity-60"></i>{{ userMap[data.dungeon_master] || `#${data.dungeon_master}` }}
@@ -181,12 +188,12 @@ onMounted(() => {
           <span v-else class="opacity-50">Geen</span>
         </template>
       </p-column>
-      <p-column header="Spelers" style="width: 6rem">
+      <p-column header="Spelers" style="width: 6rem; min-width: 6rem">
         <template #body="{ data }">
           <p-tag :value="String(playerCount(data))" severity="secondary" />
         </template>
       </p-column>
-      <p-column header="Acties" style="width: 15rem">
+      <p-column header="Acties" style="width: 13rem; min-width: 13rem">
         <template #body="{ data }">
           <div class="flex gap-2">
             <p-button icon="pi pi-pencil" size="small" severity="secondary" title="Bewerken" @click="openEdit(data)" />
@@ -197,6 +204,7 @@ onMounted(() => {
         </template>
       </p-column>
     </p-datatable>
+    </div>
 
     <CampaignFormDialog
       v-model:visible="formVisible"

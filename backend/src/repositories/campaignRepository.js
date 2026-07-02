@@ -81,6 +81,15 @@ class CampaignRepository {
     return rows[0].total;
   }
 
+  // Campagnes waarvan `userId` de dungeon master is.
+  async getByDungeonMaster(userId) {
+    const [rows] = await pool.query(
+      "SELECT * FROM campaigns WHERE dungeon_master = ?",
+      [userId]
+    );
+    return rows;
+  }
+
   // Aantal (andere) campagnes waarvan `userId` nog DM is, exclusief `exceptId`.
   async countByDungeonMaster(userId, exceptId) {
     const [rows] = await pool.query(

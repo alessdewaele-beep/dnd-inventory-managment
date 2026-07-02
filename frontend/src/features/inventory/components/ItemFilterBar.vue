@@ -4,6 +4,8 @@ import { ref, computed } from "vue";
 const props = defineProps({
   filters: { type: Object, required: true },
   selectedFilter: { type: String, required: true },
+  // Bekijkmodus: verberg de "Add"-knop (DM bekijkt een speler-inventory).
+  readonly: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["select-filter", "add-item"]);
@@ -58,6 +60,7 @@ function pick(value) {
 
       <!-- Add knop -->
       <button
+        v-if="!props.readonly"
         type="button"
         @click="emit('add-item')"
         class="flex items-center gap-1.5 rounded-lg bg-blood px-4 py-1.5 text-sm font-semibold text-white shadow hover:brightness-110 transition cursor-pointer whitespace-nowrap"

@@ -5,6 +5,7 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { itemsService } from "@/shared/services/domain/itemsService";
 import { usersService } from "@/shared/services/domain/usersService";
+import ItemsTable from "@/features/inventory/components/ItemsTable.vue";
 import ItemFormDialog from "@/features/inventory/components/ItemFormDialog.vue";
 
 const confirm = useConfirm();
@@ -12,8 +13,10 @@ const toast = useToast();
 
 const selectedUserId = ref(null);
 
+// Zelfde filteropzet als de inventory: globaal zoeken op naam.
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 });
 
 const emptyItem = () => ({ name: "", description: "", type: "", quantity: null });
@@ -42,14 +45,13 @@ async function saveItem() {
   }
 }
 
-function confirmDelete(event, item) {
+// Argumentvolgorde volgt de emit van ItemsTable: (item, event).
+function deleteItem(item, event) {
   confirm.require({
     target: event.currentTarget,
-    header: "Item verwijderen",
     message: `Weet je zeker dat je "${item.name}" wilt verwijderen?`,
-    icon: "pi pi-exclamation-triangle",
-    rejectProps: { label: "Annuleren", severity: "secondary" },
-    acceptProps: { label: "Verwijderen", severity: "danger" },
+    rejectProps: { label: "Annuleren", severity: "secondary", size: "small" },
+    acceptProps: { label: "Verwijderen", severity: "danger", size: "small" },
     accept: async () => {
       await itemsService.deleteItem(item, selectedUserId.value);
       if (itemsService.state.errorMessage) {
@@ -61,10 +63,18 @@ function confirmDelete(event, item) {
   });
 }
 
-// Laadt de items zodra een speler gekozen is.
+const toggleFavourite = (item) => itemsService.toggleFavourite(item);
+const selectFilterWord = (word) => itemsService.selectFilterWord(word);
+
+// Laadt de items zodra een speler gekozen is; wist de (gedeelde) state anders.
 watch(selectedUserId, (id) => {
-  if (id) itemsService.fetchItems(id);
-  else itemsService.state.items = [];
+  itemsService.state.selectedFilter = "";
+  if (id) {
+    itemsService.fetchItems(id);
+  } else {
+    itemsService.state.items = [];
+    itemsService.state.filteredItems = [];
+  }
 });
 
 onMounted(() => usersService.fetchAdminUsers());
@@ -75,7 +85,7 @@ onMounted(() => usersService.fetchAdminUsers());
     <h2 class="font-serif text-2xl mb-1">Inventaris</h2>
     <p class="text-sm opacity-70 mb-4">Bekijk en bewerk de items van een speler.</p>
 
-    <div class="flex flex-wrap items-center gap-3 mb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
       <label class="text-sm font-medium">Speler:</label>
       <p-select
         v-model="selectedUserId"
@@ -84,13 +94,7 @@ onMounted(() => usersService.fetchAdminUsers());
         option-value="id"
         placeholder="Kies een speler"
         filter
-        class="w-64"
-      />
-      <p-button
-        v-if="selectedUserId"
-        label="Item toevoegen"
-        icon="pi pi-plus"
-        @click="openDialog()"
+        class="w-full sm:w-64"
       />
     </div>
 
@@ -98,52 +102,17 @@ onMounted(() => usersService.fetchAdminUsers());
       {{ itemsService.state.errorMessage }}
     </p>
 
-    <p-datatable
+    <ItemsTable
       v-if="selectedUserId"
-      :value="itemsService.state.items"
+      :items="itemsService.state.filteredItems"
       :filters="filters"
-      :global-filter-fields="['name', 'type', 'description']"
-      paginator
-      :rows="10"
-      removable-sort
-      data-key="id"
-      class="my-datatable"
-    >
-      <template #header>
-        <div class="flex justify-end">
-          <p-iconField>
-            <p-inputIcon class="pi pi-search" />
-            <p-inputText v-model="filters.global.value" placeholder="Zoeken…" />
-          </p-iconField>
-        </div>
-      </template>
-
-      <template #empty>
-        <div class="py-6 text-center opacity-60">Deze speler heeft nog geen items.</div>
-      </template>
-
-      <p-column field="name" header="Naam" sortable />
-      <p-column field="type" header="Type" sortable />
-      <p-column field="quantity" header="Aantal" sortable style="width: 6rem" />
-      <p-column field="description" header="Beschrijving">
-        <template #body="{ data }">
-          <span class="opacity-80 line-clamp-2">{{ data.description }}</span>
-        </template>
-      </p-column>
-      <p-column header="Favoriet" style="width: 6rem">
-        <template #body="{ data }">
-          <i :class="data.favourite ? 'pi pi-star-fill text-gold' : 'pi pi-star opacity-40'"></i>
-        </template>
-      </p-column>
-      <p-column header="Acties" style="width: 9rem">
-        <template #body="{ data }">
-          <div class="flex gap-2">
-            <p-button icon="pi pi-pencil" size="small" severity="secondary" title="Bewerken" @click="openDialog(data)" />
-            <p-button icon="pi pi-trash" size="small" severity="danger" title="Verwijderen" @click="confirmDelete($event, data)" />
-          </div>
-        </template>
-      </p-column>
-    </p-datatable>
+      :selected-filter="itemsService.state.selectedFilter"
+      @select-filter="selectFilterWord"
+      @add-item="openDialog()"
+      @toggle-favourite="toggleFavourite"
+      @open-item="openDialog"
+      @delete-item="deleteItem"
+    />
 
     <div v-else class="opacity-60 text-sm">Kies eerst een speler om diens inventaris te tonen.</div>
 

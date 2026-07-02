@@ -5,6 +5,11 @@ const props = defineProps({
   items: { type: Array, required: true },
   filters: { type: Object, required: true },
   selectedFilter: { type: String, required: true },
+  // Bekijkmodus (DM kijkt naar de inventory van een speler): geen toevoegen,
+  // bewerken, verwijderen of favoriet togglen.
+  readonly: { type: Boolean, default: false },
+  // Toont de verstuur-actie (enkel de DM in zijn eigen inventory).
+  canSend: { type: Boolean, default: false },
 });
 
 const emit = defineEmits([
@@ -13,6 +18,7 @@ const emit = defineEmits([
   "toggle-favourite",
   "open-item",
   "delete-item",
+  "send-item",
 ]);
 </script>
 
@@ -37,6 +43,7 @@ const emit = defineEmits([
         <ItemFilterBar
           :filters="props.filters"
           :selected-filter="props.selectedFilter"
+          :readonly="props.readonly"
           @select-filter="(value) => emit('select-filter', value)"
           @add-item="emit('add-item')"
         />
@@ -65,14 +72,15 @@ const emit = defineEmits([
           <div class="flex justify-center">
             <i
               :class="[
-                'cursor-pointer transition-transform hover:scale-125',
+                'transition-transform',
+                props.readonly ? '' : 'cursor-pointer hover:scale-125',
                 slotProps.data.favourite ? 'pi pi-star-fill' : 'pi pi-star',
               ]"
               :style="{
                 fontSize: '1.1rem',
                 color: slotProps.data.favourite ? '#d9b44a' : '#9a9a9a',
               }"
-              @click="emit('toggle-favourite', slotProps.data)"
+              @click="!props.readonly && emit('toggle-favourite', slotProps.data)"
             ></i>
           </div>
         </template>
@@ -88,12 +96,24 @@ const emit = defineEmits([
           </div>
         </template>
       </p-column>
-      <p-column style="width: 10%; min-width: 4rem">
+      <p-column
+        v-if="!props.readonly"
+        header="Actions"
+        style="width: 12%; min-width: 5rem"
+      >
         <template #body="slotProps">
-          <div class="text-center">
+          <div class="flex justify-center gap-4">
+            <i
+              v-if="props.canSend"
+              class="pi pi-send cursor-pointer transition-transform hover:scale-125"
+              style="font-size: 1.1rem; color: #d9b44a"
+              title="Verstuur naar spelers"
+              @click="emit('send-item', slotProps.data)"
+            ></i>
             <i
               class="pi pi-trash cursor-pointer transition-transform hover:scale-125"
               style="font-size: 1.1rem; color: #b22222"
+              title="Verwijderen"
               @click="(event) => emit('delete-item', slotProps.data, event)"
             ></i>
           </div>
@@ -115,6 +135,16 @@ const emit = defineEmits([
   --dt-row-odd: #fbf8ee;
   --dt-row-even: #f5f1e6;
   --dt-paginator-bg: #ede6d6;
+
+  /* Neutraliseer PrimeVue's eigen row-hover thema-token, zodat rijen
+     nergens van kleur veranderen bij hover. */
+  --p-datatable-row-hover-background: transparent;
+  --p-datatable-row-hover-color: inherit;
+
+  /* Idem voor sorteerbare kolomkoppen: geen (witte) hover-achtergrond. */
+  --p-datatable-header-cell-hover-background: transparent;
+  --p-datatable-header-cell-hover-color: var(--dt-header-fg);
+  --p-datatable-header-cell-selected-background: transparent;
 
   background-color: var(--dt-bg);
   color: var(--dt-fg);
@@ -142,6 +172,18 @@ const emit = defineEmits([
 
 .my-datatable .p-datatable-thead > tr > th .p-datatable-column-header-content {
   justify-content: center;
+}
+
+/* Sorteerbare koppen mogen bij hover/focus/actief niet lichter (wit) worden:
+   ze behouden dezelfde donkere header-achtergrond als de rest. */
+.my-datatable .p-datatable-thead > tr > th.p-datatable-sortable-column:hover,
+.my-datatable .p-datatable-thead > tr > th.p-datatable-sortable-column:focus,
+.my-datatable
+  .p-datatable-thead
+  > tr
+  > th.p-datatable-sortable-column.p-datatable-column-sorted {
+  background-color: var(--dt-header-bg);
+  color: var(--dt-header-fg);
 }
 
 /* Kolommen met tekstinhoud (Name, Type) lijnen links uit, net als hun cellen */
@@ -180,9 +222,15 @@ const emit = defineEmits([
   color: var(--dt-fg);
 }
 
-.my-datatable .p-datatable-tbody > tr:hover {
-  background-color: rgba(217, 180, 74, 0.16);
+/* Geen kleurverandering bij hover: rijen houden hun eigen achtergrond. */
+.my-datatable .p-datatable-tbody > tr:nth-child(odd):hover {
+  background-color: var(--dt-row-odd);
 }
+
+.my-datatable .p-datatable-tbody > tr:nth-child(even):hover {
+  background-color: var(--dt-row-even);
+}
+
 
 .my-datatable .p-datatable-header {
   padding: 0;

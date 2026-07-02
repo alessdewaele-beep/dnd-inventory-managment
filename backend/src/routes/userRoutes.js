@@ -9,6 +9,13 @@ router.post("/login", userController.login.bind(userController));
 router.get("/profile", authenticate, userController.profile.bind(userController));
 
 router.get(
+  "/my-campaign-players",
+  authenticate,
+  authorize("DM"),
+  userController.getMyCampaignPlayers.bind(userController)
+);
+
+router.get(
   "/campaign/:campaignId",
   authenticate,
   userController.getByCampaign.bind(userController)

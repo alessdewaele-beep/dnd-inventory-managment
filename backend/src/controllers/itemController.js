@@ -36,6 +36,21 @@ class ItemController {
     res.status(201).json(item);
   }
 
+  async send(req, res) {
+    const itemId = Number(req.params.id);
+    const { recipientIds, quantity } = req.body;
+    const result = await itemService.sendItemToPlayers(
+      req.user,
+      itemId,
+      recipientIds,
+      quantity
+    );
+    if (result.error) {
+      return res.status(result.status || 400).json({ error: result.error });
+    }
+    res.status(201).json(result.created);
+  }
+
   async update(req, res) {
     console.log("update", req.body);
     const item = await itemService.updateItem(Number(req.params.id), req.body);

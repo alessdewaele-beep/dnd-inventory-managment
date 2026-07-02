@@ -18,6 +18,16 @@ export default class ApiRepository extends DnDRepository {
     return Client.put("items", item.id, item);
   }
 
+  // DM: verstuur (kopieer) een item naar spelers uit de eigen campaign.
+  async sendItem(itemId, payload) {
+    return Client.post(`items/${itemId}/send`, payload);
+  }
+
+  // DM: spelers uit de eigen campaign(s).
+  async getMyCampaignPlayers() {
+    return Client.getAll("users/my-campaign-players");
+  }
+
   async registerUser(user) {
     return Client.post("users/register", user);
   }

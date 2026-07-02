@@ -15,6 +15,14 @@ export default class DnDRepository {
     throw new Error("method not implemented", item.id);
   }
 
+  sendItem(itemId, payload) {
+    throw new Error("method not implemented", itemId);
+  }
+
+  getMyCampaignPlayers() {
+    throw new Error("method not implemented");
+  }
+
   registerUser(user) {
     throw new Error("method not implemented");
   }

@@ -84,6 +84,22 @@ class UserService {
     const rows = await userRepository.getByCampaignId(campaignId);
     return rows.map((user) => new User(user.username, user.id, user.role));
   }
+
+  // Alle spelers uit de campagne(s) die `dm` leidt, exclusief de DM zelf.
+  // Gebruikt door het DM-scherm om inventories te bekijken en items te sturen.
+  async getMyCampaignPlayers(dm) {
+    const campaigns = await campaignRepository.getByDungeonMaster(dm.id);
+    const seen = new Map();
+    for (const campaign of campaigns) {
+      const rows = await userRepository.getByCampaignId(campaign.id);
+      for (const user of rows) {
+        if (user.id !== dm.id) seen.set(user.id, user);
+      }
+    }
+    return [...seen.values()].map(
+      (user) => new User(user.username, user.id, user.role)
+    );
+  }
 }
 
 module.exports = UserService;

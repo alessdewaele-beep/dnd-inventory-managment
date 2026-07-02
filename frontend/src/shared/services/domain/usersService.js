@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 import ApiRepository from "@/shared/api/repositories/ApiRepository";
 import GetAllUsersUseCase from "@/features/inventory/useCases/GetAllUsersUseCase";
+import GetCampaignPlayersUseCase from "@/features/inventory/useCases/GetCampaignPlayersUseCase";
 import AdminGetAllUsersUseCase from "@/features/adminPanel/useCases/GetAllUsersUseCase";
 import DeleteUserUseCase from "@/features/adminPanel/useCases/DeleteUserUseCase";
 import UpdateUserUseCase from "@/features/adminPanel/useCases/UpdateUserUseCase";
@@ -8,6 +9,7 @@ import ResetUserPasswordUseCase from "@/features/adminPanel/useCases/ResetUserPa
 
 const repository = new ApiRepository();
 const getAllUsersUseCase = new GetAllUsersUseCase(repository);
+const getCampaignPlayersUseCase = new GetCampaignPlayersUseCase(repository);
 const adminGetAllUsersUseCase = new AdminGetAllUsersUseCase(repository);
 const deleteUserUseCase = new DeleteUserUseCase(repository);
 const updateUserUseCase = new UpdateUserUseCase(repository);
@@ -16,6 +18,7 @@ const resetUserPasswordUseCase = new ResetUserPasswordUseCase(repository);
 const state = reactive({
   users: [],
   adminUsers: [],
+  campaignPlayers: [],
   errorMessage: "",
 });
 
@@ -25,6 +28,16 @@ async function fetchUsers() {
     state.users = await getAllUsersUseCase.execute();
   } catch (err) {
     state.errorMessage = err.message || "Could not load users";
+  }
+}
+
+// Spelers uit de campagne(s) van de ingelogde DM (voor het DM-inventoryscherm).
+async function fetchCampaignPlayers() {
+  state.errorMessage = "";
+  try {
+    state.campaignPlayers = await getCampaignPlayersUseCase.execute();
+  } catch (err) {
+    state.errorMessage = err.message || "Kon spelers niet laden";
   }
 }
 
@@ -77,6 +90,7 @@ async function resetPassword(userId) {
 export const usersService = {
   state,
   fetchUsers,
+  fetchCampaignPlayers,
   fetchAdminUsers,
   deleteUser,
   updateUser,

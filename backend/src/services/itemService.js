@@ -32,6 +32,59 @@ class ItemService {
     return itemRepository.create(data);
   }
 
+  // De DM stuurt (een kopie van) een van zijn eigen items naar spelers uit
+  // zijn campaign. Het bronitem blijft ongewijzigd; per ontvanger wordt een
+  // nieuw item aangemaakt met het gekozen aantal.
+  async sendItemToPlayers(dm, itemId, recipientIds, quantity) {
+    const qty = Number(quantity);
+    if (!Number.isInteger(qty) || qty <= 0) {
+      return { error: "Ongeldig aantal", status: 400 };
+    }
+    if (!Array.isArray(recipientIds) || recipientIds.length === 0) {
+      return { error: "Geen ontvangers geselecteerd", status: 400 };
+    }
+
+    const source = await itemRepository.getById(itemId);
+    if (!source) return { error: "Item niet gevonden", status: 404 };
+    if (source.userId !== dm.id) {
+      return { error: "Je kan enkel je eigen items versturen", status: 403 };
+    }
+
+    // Bouw de set van geldige ontvangers: spelers uit de campagne(s) die deze
+    // DM leidt, exclusief de DM zelf.
+    const campaigns = await campaignRepository.getByDungeonMaster(dm.id);
+    const validPlayerIds = new Set();
+    for (const campaign of campaigns) {
+      const players = await userRepository.getByCampaignId(campaign.id);
+      for (const player of players) {
+        if (player.id !== dm.id) validPlayerIds.add(player.id);
+      }
+    }
+
+    const targets = recipientIds.map(Number);
+    const invalid = targets.filter((id) => !validPlayerIds.has(id));
+    if (invalid.length > 0) {
+      return {
+        error: "Eén of meer ontvangers zitten niet in jouw campaign",
+        status: 403,
+      };
+    }
+
+    const created = [];
+    for (const userId of targets) {
+      const item = await itemRepository.create({
+        name: source.name,
+        description: source.description,
+        type: source.type,
+        quantity: qty,
+        favourite: 0,
+        userId,
+      });
+      created.push(item);
+    }
+    return { created };
+  }
+
   updateItem(id, data) {
     return itemRepository.update(id, data);
   }

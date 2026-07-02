@@ -4,12 +4,14 @@ import GetAllItemsByUserIdUseCase from "@/features/inventory/useCases/GetAllItem
 import AddItemUseCase from "@/features/inventory/useCases/AddItemUseCase";
 import UpdateItemUseCase from "@/features/inventory/useCases/UpdateItemUseCase";
 import DeleteItemUseCase from "@/features/inventory/useCases/DeleteItemUseCase";
+import SendItemUseCase from "@/features/inventory/useCases/SendItemUseCase";
 
 const repository = new ApiRepository();
 const getAllItemsByUserIdUseCase = new GetAllItemsByUserIdUseCase(repository);
 const addItemUseCase = new AddItemUseCase(repository);
 const updateItemUseCase = new UpdateItemUseCase(repository);
 const deleteItemUseCase = new DeleteItemUseCase(repository);
+const sendItemUseCase = new SendItemUseCase(repository);
 
 const state = reactive({
   items: [],
@@ -85,6 +87,19 @@ async function deleteItem(item, userId) {
   }
 }
 
+// DM: stuurt een kopie van `item` naar de opgegeven spelers. Het eigen item
+// blijft ongewijzigd, dus geen refetch nodig. Geeft true bij succes terug.
+async function sendItem(item, recipientIds, quantity) {
+  state.errorMessage = "";
+  try {
+    await sendItemUseCase.execute(item.id, recipientIds, quantity);
+    return true;
+  } catch (err) {
+    state.errorMessage = err.message || "Kon item niet versturen";
+    return false;
+  }
+}
+
 async function toggleFavourite(item) {
   item.favourite = !item.favourite;
   try {
@@ -107,6 +122,7 @@ export const itemsService = {
   addItem,
   updateItem,
   deleteItem,
+  sendItem,
   toggleFavourite,
   selectFilterWord,
 };
