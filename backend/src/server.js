@@ -4,6 +4,7 @@ const cors = require("cors");
 const itemRoutes = require("./routes/itemRoutes");
 const userRoutes = require("./routes/userRoutes");
 const campaignRoutes = require("./routes/campaignRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.get("/health", (req, res) => {
 app.use("/items", itemRoutes);
 app.use("/users", userRoutes);
 app.use("/campaigns", campaignRoutes);
+app.use("/admin", adminRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

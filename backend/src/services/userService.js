@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const userRepository = require("../repositories/userRepository");
 const campaignRepository = require("../repositories/campaignRepository");
 const { JWT_SECRET, JWT_EXPIRES_IN } = require("../config");
@@ -36,18 +37,39 @@ class UserService {
     return { token, id: user.id, username: user.username, role: user.role };
   }
 
+  // Volledige lijst voor het admin-scherm: id, username, role, campaign_id,
+  // created_at. Nooit password_hash (repository selecteert die niet).
   async getAll() {
-    try {
-      const users = [];
-      const userRaw = await userRepository.getAll();
-      userRaw.forEach((user) => {
-        users.push(new User(user.username, user.id, user.role));
-      });
-      console.log(users);
-      return users;
-    } catch (err) {
-      throw err;
-    }
+    return userRepository.getAll();
+  }
+
+  async deleteUser(id) {
+    return userRepository.deleteById(id);
+  }
+
+  // Beheert rol en campagne-koppeling van een gebruiker (admin).
+  async updateUser(id, data) {
+    const allowed = {};
+    if (data.role !== undefined) allowed.role = data.role;
+    if (data.campaign_id !== undefined) allowed.campaign_id = data.campaign_id;
+    const updated = await userRepository.update(id, allowed);
+    if (!updated) return null;
+    return {
+      id: updated.id,
+      username: updated.username,
+      role: updated.role,
+      campaign_id: updated.campaign_id,
+    };
+  }
+
+  // Genereert een tijdelijk wachtwoord, slaat het (gehasht) op en geeft het
+  // eenmalig terug zodat de admin het aan de speler kan doorgeven.
+  async resetPassword(id) {
+    const user = await userRepository.findById(id);
+    if (!user) return null;
+    const tempPassword = crypto.randomBytes(6).toString("hex"); // 12 tekens
+    await userRepository.updatePassword(id, tempPassword);
+    return { id: user.id, username: user.username, password: tempPassword };
   }
 
   // Mag `requester` de spelers van deze campaign opvragen?
@@ -55,7 +77,7 @@ class UserService {
   async canViewCampaignPlayers(requester, campaignId) {
     if (requester.role === "Admin") return true;
     const campaign = await campaignRepository.getById(campaignId);
-    return !!campaign && campaign.dungeon_master_id === requester.id;
+    return !!campaign && campaign.dungeon_master === requester.id;
   }
 
   async getPlayersByCampaign(campaignId) {

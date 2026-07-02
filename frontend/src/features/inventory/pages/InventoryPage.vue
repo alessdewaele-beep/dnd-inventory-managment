@@ -65,7 +65,6 @@ const deleteItem = (item, event) => {
   confirm.require({
     target: event.currentTarget,
     message: `Delete "${item.name}"?`,
-    icon: "pi pi-exclamation-triangle",
     rejectProps: { label: "Cancel", severity: "secondary", size: "small" },
     acceptProps: { label: "Delete", icon: "pi pi-trash", size: "small", class: "dt-primary-btn" },
     accept: () => itemsService.deleteItem(item, userId.value),
@@ -96,7 +95,7 @@ onMounted(async () => {
   <AppNavbar />
   <div
     v-if="hasRight('DM')"
-    class="flex items-center gap-3 max-w-6xl mx-auto px-4 pt-4 text-ink dark:text-ink-light"
+    class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 max-w-6xl mx-auto px-4 pt-4 text-ink dark:text-ink-light"
   >
     <label class="text-sm font-medium">Select user to look at their inventory:</label>
     <p-select
@@ -105,6 +104,7 @@ onMounted(async () => {
       option-label="username"
       option-value="id"
       placeholder="Select a user"
+      class="w-full sm:w-auto"
     ></p-select>
   </div>
 

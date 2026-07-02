@@ -21,11 +21,11 @@ class CampaignRepository {
 
   async create(campaign) {
     // De DM wordt pas na registratie van de karakters aangesteld,
-    // dus dungeon_master_id is bij het aanmaken doorgaans nog leeg.
-    const { name, description, dungeon_master_id = null } = campaign;
+    // dus dungeon_master is bij het aanmaken doorgaans nog leeg.
+    const { name, description, dungeon_master = null } = campaign;
     const [result] = await pool.query(
-      "INSERT INTO campaigns (name, description, dungeon_master_id) VALUES (?, ?, ?)",
-      [name, description, dungeon_master_id]
+      "INSERT INTO campaigns (name, description, dungeon_master) VALUES (?, ?, ?)",
+      [name, description, dungeon_master]
     );
     return { id: result.insertId, ...campaign };
   }
@@ -67,6 +67,27 @@ class CampaignRepository {
     if (!campaign) return null;
     await pool.query("DELETE FROM campaigns WHERE id = ?", [id]);
     return campaign;
+  }
+
+  async countAll() {
+    const [rows] = await pool.query("SELECT COUNT(*) AS total FROM campaigns");
+    return rows[0].total;
+  }
+
+  async countWithDm() {
+    const [rows] = await pool.query(
+      "SELECT COUNT(*) AS total FROM campaigns WHERE dungeon_master IS NOT NULL"
+    );
+    return rows[0].total;
+  }
+
+  // Aantal (andere) campagnes waarvan `userId` nog DM is, exclusief `exceptId`.
+  async countByDungeonMaster(userId, exceptId) {
+    const [rows] = await pool.query(
+      "SELECT COUNT(*) AS total FROM campaigns WHERE dungeon_master = ? AND id <> ?",
+      [userId, exceptId]
+    );
+    return rows[0].total;
   }
 }
 

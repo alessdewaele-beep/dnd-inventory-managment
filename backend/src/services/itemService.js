@@ -25,7 +25,7 @@ class ItemService {
     if (!target || !target.campaign_id) return false;
 
     const campaign = await campaignRepository.getById(target.campaign_id);
-    return !!campaign && campaign.dungeon_master_id === requester.id;
+    return !!campaign && campaign.dungeon_master === requester.id;
   }
 
   createItem(data) {

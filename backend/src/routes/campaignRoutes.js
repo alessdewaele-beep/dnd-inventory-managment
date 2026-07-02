@@ -14,4 +14,6 @@ router.post("/", authorize("Admin"), campaignController.create.bind(campaignCont
 router.put("/:id", authorize("Admin"), campaignController.update.bind(campaignController));
 router.delete("/:id", authorize("Admin"), campaignController.delete.bind(campaignController));
 
+router.post("/:id/dm", authorize("Admin"), campaignController.assignDm.bind(campaignController));
+
 module.exports = router;

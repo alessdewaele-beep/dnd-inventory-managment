@@ -1,18 +1,24 @@
 <script setup>
 import { ref } from "vue";
 import { authService } from "@/shared/services/domain/authService";
+import { Roles } from "@/entities/user/Roles";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import AppNavbar from "@/shared/components/AppNavbar.vue";
 
 const username = ref("");
 const password = ref("");
 
-const { goHome } = useNavigation();
+const { goHome, goTo } = useNavigation();
 
 const logInUser = async () => {
   const success = await authService.login(username.value, password.value);
   if (success) {
-    goHome();
+    // Admins gaan meteen naar het adminpaneel; anderen naar hun inventory.
+    if (authService.getRole() === Roles.ADMIN) {
+      goTo("/admin");
+    } else {
+      goHome();
+    }
   }
 };
 </script>

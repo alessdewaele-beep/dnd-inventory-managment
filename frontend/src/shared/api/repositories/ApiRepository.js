@@ -33,4 +33,43 @@ export default class ApiRepository extends DnDRepository {
   async getPublicCampaigns() {
     return Client.getAll("campaigns/public");
   }
+
+  // --- Admin: gebruikers ---
+  async deleteUser(userId) {
+    return Client.delete("users", userId);
+  }
+
+  async updateUser(userId, data) {
+    return Client.put("users", userId, data);
+  }
+
+  async resetUserPassword(userId) {
+    return Client.post(`users/${userId}/reset-password`, {});
+  }
+
+  // --- Admin: campagnes ---
+  async getAllCampaigns() {
+    return Client.getAll("campaigns");
+  }
+
+  async createCampaign(campaign) {
+    return Client.post("campaigns", campaign);
+  }
+
+  async updateCampaign(campaignId, data) {
+    return Client.put("campaigns", campaignId, data);
+  }
+
+  async deleteCampaign(campaignId) {
+    return Client.delete("campaigns", campaignId);
+  }
+
+  async assignDungeonMaster(campaignId, userId) {
+    return Client.post(`campaigns/${campaignId}/dm`, { userId });
+  }
+
+  // --- Admin: dashboard ---
+  async getAdminStats() {
+    return Client.getAll("admin/stats");
+  }
 }

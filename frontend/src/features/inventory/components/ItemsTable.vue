@@ -26,6 +26,7 @@ const emit = defineEmits([
       paginator
       :rows="10"
       stripedRows
+      scrollable
     >
       <template #empty>
         <p class="italic text-sm text-ink dark:text-ink-light py-6 text-center">
@@ -41,12 +42,12 @@ const emit = defineEmits([
         />
       </template>
 
-      <p-column field="name" header="Name" headerClass="dt-col-left" style="width: 30%">
+      <p-column field="name" header="Name" headerClass="dt-col-left" style="width: 30%; min-width: 9rem">
         <template #body="slotProps">
           <span class="font-semibold">{{ slotProps.data.name }}</span>
         </template>
       </p-column>
-      <p-column field="type" header="Type" headerClass="dt-col-left" style="width: 30%">
+      <p-column field="type" header="Type" headerClass="dt-col-left" style="width: 30%; min-width: 7rem">
         <template #body="slotProps">
           <span
             class="inline-block rounded-full px-3 py-1 text-xs font-medium capitalize bg-ink/10 dark:bg-white/10"
@@ -54,12 +55,12 @@ const emit = defineEmits([
           >
         </template>
       </p-column>
-      <p-column field="quantity" header="Qty." style="width: 10%">
+      <p-column field="quantity" header="Qty." style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
           <div class="text-center">{{ slotProps.data.quantity }}</div>
         </template>
       </p-column>
-      <p-column field="favourite" header="Fav." style="width: 10%">
+      <p-column field="favourite" header="Fav." style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
           <div class="flex justify-center">
             <i
@@ -76,7 +77,7 @@ const emit = defineEmits([
           </div>
         </template>
       </p-column>
-      <p-column header="Info" style="width: 10%">
+      <p-column header="Info" style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
           <div class="flex justify-center">
             <i
@@ -87,7 +88,7 @@ const emit = defineEmits([
           </div>
         </template>
       </p-column>
-      <p-column style="width: 10%">
+      <p-column style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
           <div class="text-center">
             <i

@@ -1,8 +1,9 @@
 import { authService } from "@/shared/services/domain/authService";
 
 export function useRightManager() {
+  // Sleutels gelijk aan de backend-rolstrings (JWT): Player < DM < Admin.
   const hierarchy = {
-    Speler: 1,
+    Player: 1,
     DM: 2,
     Admin: 3,
   };

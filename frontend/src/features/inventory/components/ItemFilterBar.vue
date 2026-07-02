@@ -1,4 +1,6 @@
 <script setup>
+import { ref, computed } from "vue";
+
 const props = defineProps({
   filters: { type: Object, required: true },
   selectedFilter: { type: String, required: true },
@@ -13,31 +15,70 @@ const filterButtons = [
   { label: "Potions", icon: "pi pi-heart-fill", value: "potion", bgColor: "#1e40af", color: "#f5f5f5" },
   { label: "Jewelry", icon: "pi pi-star", value: "jewelry", bgColor: "#d4af37", color: "#1b1b1b" },
 ];
+
+// Inklapstatus van de categoriefilters op mobiel. Vanaf sm zijn ze altijd zichtbaar.
+const filtersOpen = ref(false);
+
+// Toont de gekozen categorie op de toggle-knop, zodat je bij ingeklapte filters
+// nog steeds ziet welke actief is.
+const activeLabel = computed(
+  () => filterButtons.find((b) => b.value === props.selectedFilter)?.label ?? "Filters"
+);
+
+function pick(value) {
+  emit("select-filter", value);
+  filtersOpen.value = false; // sluit de lijst na een keuze op mobiel
+}
 </script>
 
 <template>
-  <div
-    class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-ink text-gold dark:bg-black/40"
-  >
-    <!-- Zoekveld -->
-    <div class="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5">
-      <p-inputIcon>
-        <i class="pi pi-search text-blood"></i>
-      </p-inputIcon>
-      <p-inputText
-        v-model="props.filters['global'].value"
-        placeholder="Keyword Search"
-        class="!bg-transparent !border-none !text-ink-light !outline-none"
-      />
+  <div class="flex flex-col gap-3 px-4 py-3 bg-ink text-gold dark:bg-black/40">
+    <!-- Bovenste rij: zoeken + acties (altijd zichtbaar) -->
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Zoekveld -->
+      <div class="flex flex-1 min-w-[10rem] items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5">
+        <i class="pi pi-search text-blood shrink-0"></i>
+        <p-inputText
+          v-model="props.filters['global'].value"
+          placeholder="Keyword Search"
+          class="!bg-transparent !border-none !text-ink-light !outline-none w-full"
+        />
+      </div>
+
+      <!-- Filters-toggle: enkel op mobiel -->
+      <button
+        type="button"
+        @click="filtersOpen = !filtersOpen"
+        class="sm:hidden flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium cursor-pointer"
+      >
+        <i class="pi pi-filter"></i>
+        <span>{{ activeLabel }}</span>
+        <i :class="filtersOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="text-xs"></i>
+      </button>
+
+      <!-- Add knop -->
+      <button
+        type="button"
+        @click="emit('add-item')"
+        class="flex items-center gap-1.5 rounded-lg bg-blood px-4 py-1.5 text-sm font-semibold text-white shadow hover:brightness-110 transition cursor-pointer whitespace-nowrap"
+      >
+        <i class="pi pi-plus"></i>
+        Add
+      </button>
     </div>
 
-    <!-- Categorie-filters -->
-    <div class="flex flex-wrap gap-2">
+    <!-- Categorie-filters: inklapbaar op mobiel, altijd zichtbaar vanaf sm -->
+    <div
+      :class="[
+        filtersOpen ? 'flex' : 'hidden',
+        'sm:flex flex-wrap gap-2',
+      ]"
+    >
       <button
         v-for="btn in filterButtons"
         :key="btn.value"
         type="button"
-        @click="emit('select-filter', btn.value)"
+        @click="pick(btn.value)"
         :style="{ backgroundColor: btn.bgColor, color: btn.color }"
         :class="[
           'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-transform hover:scale-105 cursor-pointer',
@@ -50,15 +91,5 @@ const filterButtons = [
         {{ btn.label }}
       </button>
     </div>
-
-    <!-- Add knop -->
-    <button
-      type="button"
-      @click="emit('add-item')"
-      class="flex items-center gap-1.5 rounded-lg bg-blood px-4 py-1.5 text-sm font-semibold text-white shadow hover:brightness-110 transition cursor-pointer"
-    >
-      <i class="pi pi-plus"></i>
-      Add Item
-    </button>
   </div>
 </template>

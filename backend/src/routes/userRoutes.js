@@ -21,4 +21,25 @@ router.get(
   userController.getAll.bind(userController)
 );
 
+router.put(
+  "/:id",
+  authenticate,
+  authorize("Admin"),
+  userController.update.bind(userController)
+);
+
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("Admin"),
+  userController.delete.bind(userController)
+);
+
+router.post(
+  "/:id/reset-password",
+  authenticate,
+  authorize("Admin"),
+  userController.resetPassword.bind(userController)
+);
+
 module.exports = router;

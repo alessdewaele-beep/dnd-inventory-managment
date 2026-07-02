@@ -39,6 +39,39 @@ class UserController {
     }
   }
 
+  async delete(req, res) {
+    try {
+      const deleted = await service.deleteUser(Number(req.params.id));
+      if (!deleted)
+        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+      res.json(deleted);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const updated = await service.updateUser(Number(req.params.id), req.body);
+      if (!updated)
+        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+      res.json(updated);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const result = await service.resetPassword(Number(req.params.id));
+      if (!result)
+        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+      res.json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
   async getByCampaign(req, res) {
     try {
       const campaignId = Number(req.params.campaignId);

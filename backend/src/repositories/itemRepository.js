@@ -66,6 +66,23 @@ class ItemRepository {
     await pool.query("DELETE FROM items WHERE id = ?", [id]);
     return item;
   }
+
+  async countAll() {
+    const [rows] = await pool.query("SELECT COUNT(*) AS total FROM items");
+    return rows[0].total;
+  }
+
+  async getRecent(limit = 5) {
+    const [rows] = await pool.query(
+      `SELECT i.id, i.name, i.type, i.created_at, i.userId, u.username AS owner
+       FROM items i
+       LEFT JOIN users u ON u.id = i.userId
+       ORDER BY i.created_at DESC
+       LIMIT ?`,
+      [Number(limit)]
+    );
+    return rows;
+  }
 }
 
 module.exports = new ItemRepository();

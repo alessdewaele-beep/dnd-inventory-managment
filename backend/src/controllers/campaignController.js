@@ -20,11 +20,11 @@ class CampaignController {
 
   async create(req, res) {
     console.log("create", req.body);
-    const { name, description, dungeon_master_id } = req.body;
+    const { name, description, dungeon_master } = req.body;
     const campaign = await campaignService.createCampaign({
       name,
       description,
-      dungeon_master_id,
+      dungeon_master,
     });
     res.status(201).json(campaign);
   }
@@ -43,6 +43,16 @@ class CampaignController {
   async delete(req, res) {
     const campaign = await campaignService.deleteCampaign(
       Number(req.params.id)
+    );
+    if (!campaign)
+      return res.status(404).json({ message: "Campaign not found" });
+    res.json(campaign);
+  }
+
+  async assignDm(req, res) {
+    const campaign = await campaignService.assignDungeonMaster(
+      Number(req.params.id),
+      req.body.userId ?? null
     );
     if (!campaign)
       return res.status(404).json({ message: "Campaign not found" });

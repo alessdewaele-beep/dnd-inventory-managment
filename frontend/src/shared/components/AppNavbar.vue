@@ -16,30 +16,30 @@ const logOutAction = () => {
 
 <template>
   <nav
-    class="h-[64px] flex items-center justify-between gap-4 px-6 border-b-2 border-gold bg-parchment/95 backdrop-blur shadow-sm dark:bg-ink dark:border-gold-deep"
+    class="h-[64px] flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 border-b-2 border-gold bg-parchment/95 backdrop-blur shadow-sm dark:bg-ink dark:border-gold-deep"
   >
     <!-- Logo & titel -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
       <img
         src="../../../img/redDragon.png"
         alt="red dragon"
-        class="h-10 w-auto drop-shadow-md"
+        class="h-9 sm:h-10 w-auto drop-shadow-md shrink-0"
       />
       <h1
-        class="font-serif text-lg sm:text-xl tracking-wide text-ink dark:text-ink-light"
+        class="font-serif text-base sm:text-xl tracking-wide text-ink dark:text-ink-light truncate"
       >
         DnD Inventory Manager
       </h1>
     </div>
 
     <!-- Rechts: acties / user info / auth -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <p-button
         v-if="hasRight('Admin')"
-        label="Start campaign"
-        icon="pi pi-flag"
+        label="Admin"
+        icon="pi pi-shield"
         size="small"
-        @click="goIfAllowed('/newCampaign', 'Admin')"
+        @click="goIfAllowed('/admin', 'Admin')"
       />
 
       <button

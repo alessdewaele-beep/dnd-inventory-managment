@@ -5,6 +5,10 @@ import InventoryPage from "@/features/inventory/pages/InventoryPage.vue";
 import RegisterPage from "@/features/auth/pages/RegisterPage.vue";
 import LoginPage from "@/features/auth/pages/LoginPage.vue";
 import AdminPanelPage from "@/features/adminPanel/pages/AdminPanelPage.vue";
+import AdminDashboardPage from "@/features/adminPanel/pages/AdminDashboardPage.vue";
+import AdminUsersPage from "@/features/adminPanel/pages/AdminUsersPage.vue";
+import AdminCampaignsPage from "@/features/adminPanel/pages/AdminCampaignsPage.vue";
+import AdminItemsPage from "@/features/adminPanel/pages/AdminItemsPage.vue";
 
 const routes = [
   { path: "/", name: "start", component: LoginPage },
@@ -16,10 +20,15 @@ const routes = [
   },
   { path: "/register", name: "Register", component: RegisterPage },
   {
-    path: "/newCampaign",
-    name: "newCampaign",
+    path: "/admin",
     component: AdminPanelPage,
     meta: { requiresAuth: true, requiredRole: "Admin" },
+    children: [
+      { path: "", name: "AdminDashboard", component: AdminDashboardPage },
+      { path: "users", name: "AdminUsers", component: AdminUsersPage },
+      { path: "campaigns", name: "AdminCampaigns", component: AdminCampaignsPage },
+      { path: "items", name: "AdminItems", component: AdminItemsPage },
+    ],
   },
 ];
 
