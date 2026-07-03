@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { authService } from "@/shared/services/domain/authService";
 import { itemsService } from "@/shared/services/domain/itemsService";
+import { currencyService } from "@/shared/services/domain/currencyService";
 import { usersService } from "@/shared/services/domain/usersService";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import { useRightManager } from "@/shared/composables/useRightManager";
@@ -10,6 +11,7 @@ import AppNavbar from "@/shared/components/AppNavbar.vue";
 import ItemsTable from "@/features/inventory/components/ItemsTable.vue";
 import ItemFormDialog from "@/features/inventory/components/ItemFormDialog.vue";
 import SendItemDialog from "@/features/inventory/components/SendItemDialog.vue";
+import CurrencyCard from "@/features/inventory/components/CurrencyCard.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
@@ -44,6 +46,7 @@ const emptyItem = () => ({
   description: "",
   type: "",
   quantity: null,
+  image: null,
 });
 
 const dialogVisible = ref(false);
@@ -96,6 +99,21 @@ const markSeen = (itemId) => {
 const selectFilterWord = (filterWord) =>
   itemsService.selectFilterWord(filterWord);
 
+// --- Currency: beurs van de getoonde speler opslaan ---
+const saveCurrency = async (coins) => {
+  const ok = await currencyService.saveCurrency(userId.value, coins);
+  toast.add(
+    ok
+      ? { severity: "success", summary: "Opgeslagen", detail: "Beurs bijgewerkt.", life: 2500 }
+      : {
+          severity: "error",
+          summary: "Mislukt",
+          detail: currencyService.state.errorMessage || "Kon het geld niet opslaan",
+          life: 4000,
+        }
+  );
+};
+
 // --- DM: item versturen naar spelers ---
 const sendDialogVisible = ref(false);
 const itemToSend = ref(null);
@@ -142,6 +160,7 @@ onMounted(async () => {
   }
 
   await itemsService.fetchItems(userId.value);
+  await currencyService.fetchCurrency(userId.value);
   // Poll periodiek zodat items die een admin of DM intussen toevoegt (met hun
   // "Nieuw"-notificatie) verschijnen zonder handmatige refresh.
   itemsService.startPolling(userId.value);
@@ -155,6 +174,7 @@ watch(selectedUser, async (value) => {
   userId.value = value || ownUserId.value;
   itemsService.selectFilterWord(""); // reset categoriefilter bij wissel
   await itemsService.fetchItems(userId.value);
+  await currencyService.fetchCurrency(userId.value);
   itemsService.startPolling(userId.value);
 });
 </script>
@@ -183,6 +203,10 @@ watch(selectedUser, async (value) => {
   </div>
 
   <div class="max-w-6xl mx-auto px-4 pt-5 pb-10">
+    <CurrencyCard
+      :currency="currencyService.state.currency"
+      @save="saveCurrency"
+    />
     <ItemsTable
       :items="itemsService.state.filteredItems"
       :filters="filters"
@@ -202,6 +226,7 @@ watch(selectedUser, async (value) => {
   <ItemFormDialog
     v-model:visible="dialogVisible"
     :item="selectedItem"
+    :readonly="isViewingOther"
     @save="saveItem"
     @cancel="closeDialog"
   />

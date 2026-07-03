@@ -27,12 +27,13 @@ class ItemRepository {
       favourite,
       userId,
       is_new = false,
+      image = null,
     } = item;
     const [result] = await pool.query(
-      "INSERT INTO items (name, description, type, quantity, favourite, userId, is_new) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [name, description, type, quantity, favourite, userId, is_new]
+      "INSERT INTO items (name, description, type, quantity, favourite, userId, is_new, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [name, description, type, quantity, favourite, userId, is_new, image]
     );
-    return { id: result.insertId, ...item, is_new };
+    return { id: result.insertId, ...item, is_new, image };
   }
 
   // Eigenaar heeft het nieuwe item gezien: notificatievlag uitzetten.

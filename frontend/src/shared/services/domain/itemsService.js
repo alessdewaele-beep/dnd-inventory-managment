@@ -67,10 +67,20 @@ async function addItem(item, userId) {
   }
 }
 
+// Stuurt enkel de bewerkbare velden mee (niet id/created_at/userId of de hele
+// reactive kopie). De backend-update is dynamisch over de meegestuurde keys.
 async function updateItem(item, userId) {
   state.errorMessage = "";
   try {
-    await updateItemUseCase.execute(item);
+    await updateItemUseCase.execute({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      type: item.type,
+      quantity: item.quantity,
+      favourite: item.favourite,
+      image: item.image ?? null,
+    });
     await fetchItems(userId);
     return true;
   } catch (err) {
@@ -135,7 +145,9 @@ function stopPolling() {
 async function toggleFavourite(item) {
   item.favourite = !item.favourite;
   try {
-    await updateItemUseCase.execute(item);
+    // Enkel de gewijzigde vlag versturen: zo gaat de (mogelijk grote) base64-
+    // foto niet bij elke favoriet-toggle opnieuw over de lijn en naar de DB.
+    await updateItemUseCase.execute({ id: item.id, favourite: item.favourite });
     sortItems();
   } catch (err) {
     item.favourite = !item.favourite;

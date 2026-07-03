@@ -96,6 +96,7 @@ class ItemService {
         quantity: qty,
         favourite: 0,
         userId,
+        image: source.image, // verstuurd item behoudt zijn foto
         is_new: true, // ontvanger krijgt een notificatie in zijn inventory
       });
       created.push(item);

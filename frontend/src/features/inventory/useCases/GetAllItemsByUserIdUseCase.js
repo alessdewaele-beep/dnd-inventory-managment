@@ -19,7 +19,8 @@ export default class GetAllItemsByUserIdUseCase {
           item.quantity,
           item.created_at,
           item.favourite,
-          item.is_new
+          item.is_new,
+          item.image
         )
       );
     });

@@ -89,4 +89,13 @@ export default class DnDRepository {
   getAdminStats() {
     throw new Error("method not implemented");
   }
+
+  // --- Currency ---
+  getCurrency(userId) {
+    throw new Error("method not implemented", userId);
+  }
+
+  updateCurrency(userId, coins) {
+    throw new Error("method not implemented", userId);
+  }
 }

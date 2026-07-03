@@ -24,7 +24,8 @@ class ItemController {
 
   async create(req, res) {
     console.log("create", req.body);
-    const { name, description, type, quantity, favourite, userId } = req.body;
+    const { name, description, type, quantity, favourite, userId, image } =
+      req.body;
     const item = await itemService.createItem(
       {
         name,
@@ -33,6 +34,7 @@ class ItemController {
         quantity,
         favourite,
         userId,
+        image,
       },
       req.user
     );

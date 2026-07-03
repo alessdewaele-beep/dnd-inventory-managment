@@ -1,6 +1,7 @@
 <script setup>
 import { onUnmounted } from "vue";
 import ItemFilterBar from "@/features/inventory/components/ItemFilterBar.vue";
+import { typeIcon } from "@/entities/item/itemIcon";
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -105,13 +106,33 @@ onUnmounted(clearHover);
 
       <p-column field="name" header="Name" headerClass="dt-col-left" style="width: 30%; min-width: 9rem">
         <template #body="slotProps">
-          <span class="font-semibold">{{ slotProps.data.name }}</span>
-          <span
-            v-if="slotProps.data.is_new"
-            class="new-badge"
-            title="Nieuw item — verdwijnt zodra je erover hovert"
-            >Nieuw</span
-          >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex items-center justify-center rounded-md border border-gold/60 overflow-hidden bg-ink/5 dark:bg-white/5 shrink-0"
+              style="width: 2.5rem; height: 2.5rem"
+            >
+              <img
+                v-if="slotProps.data.image"
+                :src="slotProps.data.image"
+                :alt="slotProps.data.name"
+                class="w-full h-full object-cover"
+              />
+              <span
+                v-else
+                class="leading-none"
+                style="font-size: 1.25rem"
+                :title="slotProps.data.type"
+                >{{ typeIcon(slotProps.data.type) }}</span
+              >
+            </div>
+            <span class="font-semibold">{{ slotProps.data.name }}</span>
+            <span
+              v-if="slotProps.data.is_new"
+              class="new-badge"
+              title="Nieuw item — verdwijnt zodra je erover hovert"
+              >Nieuw</span
+            >
+          </div>
         </template>
       </p-column>
       <p-column field="type" header="Type" headerClass="dt-col-left" style="width: 30%; min-width: 7rem">

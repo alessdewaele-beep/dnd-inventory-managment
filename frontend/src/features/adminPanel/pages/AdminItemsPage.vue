@@ -19,7 +19,7 @@ const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 });
 
-const emptyItem = () => ({ name: "", description: "", type: "", quantity: null });
+const emptyItem = () => ({ name: "", description: "", type: "", quantity: null, image: null });
 const dialogVisible = ref(false);
 const selectedItem = ref(emptyItem());
 

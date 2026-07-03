@@ -96,4 +96,13 @@ export default class ApiRepository extends DnDRepository {
   async getAdminStats() {
     return Client.getAll("admin/stats");
   }
+
+  // --- Currency: muntenbeurs van een gebruiker ---
+  async getCurrency(userId) {
+    return Client.getAll(`currencies/${userId}`);
+  }
+
+  async updateCurrency(userId, coins) {
+    return Client.put("currencies", userId, coins);
+  }
 }
