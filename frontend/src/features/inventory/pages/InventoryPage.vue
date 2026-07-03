@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import { authService } from "@/shared/services/domain/authService";
 import { itemsService } from "@/shared/services/domain/itemsService";
@@ -87,6 +87,12 @@ const deleteItem = (item, event) => {
   });
 };
 const toggleFavourite = (item) => itemsService.toggleFavourite(item);
+
+// Enkel de eigenaar zelf markeert een nieuw item als gezien; een DM of admin
+// die meekijkt laat de notificatie van de speler intact.
+const markSeen = (itemId) => {
+  if (!isViewingOther.value) itemsService.markItemSeen(itemId);
+};
 const selectFilterWord = (filterWord) =>
   itemsService.selectFilterWord(filterWord);
 
@@ -136,7 +142,12 @@ onMounted(async () => {
   }
 
   await itemsService.fetchItems(userId.value);
+  // Poll periodiek zodat items die een admin of DM intussen toevoegt (met hun
+  // "Nieuw"-notificatie) verschijnen zonder handmatige refresh.
+  itemsService.startPolling(userId.value);
 });
+
+onUnmounted(() => itemsService.stopPolling());
 
 // Wisselt de getoonde inventory wanneer een andere speler wordt gekozen.
 // Leeg (of gewist) betekent terug naar de eigen inventory.
@@ -144,6 +155,7 @@ watch(selectedUser, async (value) => {
   userId.value = value || ownUserId.value;
   itemsService.selectFilterWord(""); // reset categoriefilter bij wissel
   await itemsService.fetchItems(userId.value);
+  itemsService.startPolling(userId.value);
 });
 </script>
 
@@ -183,6 +195,7 @@ watch(selectedUser, async (value) => {
       @open-item="openDialog"
       @delete-item="deleteItem"
       @send-item="openSend"
+      @seen-item="markSeen"
     />
   </div>
 

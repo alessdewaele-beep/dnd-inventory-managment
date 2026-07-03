@@ -95,17 +95,6 @@ class UserController {
     }
   }
 
-  async resetPassword(req, res) {
-    try {
-      const result = await service.resetPassword(Number(req.params.id));
-      if (!result)
-        return res.status(404).json({ error: "Gebruiker niet gevonden" });
-      res.json(result);
-    } catch (err) {
-      res.status(400).json({ error: err.message });
-    }
-  }
-
   async getMyCampaignPlayers(req, res) {
     try {
       const players = await service.getMyCampaignPlayers(req.user);

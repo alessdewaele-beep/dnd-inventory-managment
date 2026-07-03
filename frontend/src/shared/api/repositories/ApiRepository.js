@@ -23,6 +23,11 @@ export default class ApiRepository extends DnDRepository {
     return Client.post(`items/${itemId}/send`, payload);
   }
 
+  // Eigenaar heeft een nieuw item gezien: notificatievlag uitzetten.
+  async markItemSeen(itemId) {
+    return Client.patch(`items/${itemId}/seen`, null, null);
+  }
+
   // DM: spelers uit de eigen campaign(s).
   async getMyCampaignPlayers() {
     return Client.getAll("users/my-campaign-players");
@@ -64,10 +69,6 @@ export default class ApiRepository extends DnDRepository {
 
   async updateUser(userId, data) {
     return Client.put("users", userId, data);
-  }
-
-  async resetUserPassword(userId) {
-    return Client.post(`users/${userId}/reset-password`, {});
   }
 
   // --- Admin: campagnes ---

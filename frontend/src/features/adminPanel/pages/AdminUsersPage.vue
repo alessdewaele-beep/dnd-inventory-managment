@@ -13,9 +13,6 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-// Toont het gegenereerde wachtwoord eenmalig na een reset.
-const resetDialog = ref({ visible: false, username: "", password: "" });
-
 // campaign_id -> campagnenaam, om leesbare namen in de tabel te tonen.
 const campaignMap = computed(() => {
   const map = {};
@@ -45,23 +42,6 @@ function confirmDelete(event, user) {
       }
     },
   });
-}
-
-async function resetPassword(user) {
-  const result = await usersService.resetPassword(user.id);
-  if (result?.password) {
-    resetDialog.value = { visible: true, username: result.username, password: result.password };
-  } else {
-    toast.add({ severity: "error", summary: "Fout", detail: usersService.state.errorMessage, life: 4000 });
-  }
-}
-
-async function copyPassword() {
-  try {
-    await navigator.clipboard.writeText(resetDialog.value.password);
-    toast.add({ severity: "success", summary: "Gekopieerd", life: 2000 });
-  } catch {
-  }
 }
 
 function roleSeverity(role) {
@@ -139,13 +119,6 @@ onMounted(() => {
         <template #body="{ data }">
           <div class="flex gap-2">
             <p-button
-              icon="pi pi-key"
-              size="small"
-              severity="secondary"
-              title="Wachtwoord resetten"
-              @click="resetPassword(data)"
-            />
-            <p-button
               icon="pi pi-trash"
               size="small"
               severity="danger"
@@ -157,28 +130,5 @@ onMounted(() => {
       </p-column>
     </p-datatable>
     </div>
-
-    <!-- Tijdelijk wachtwoord na reset -->
-    <p-dialog
-      v-model:visible="resetDialog.visible"
-      modal
-      class="my-dialog w-full max-w-[460px] mx-4"
-      :header="`Nieuw wachtwoord voor ${resetDialog.username}`"
-    >
-      <div class="flex flex-col gap-3 pt-2">
-        <p class="text-sm opacity-80">
-          Geef dit tijdelijke wachtwoord door aan de gebruiker. Het wordt maar één keer getoond.
-        </p>
-        <div class="flex items-center gap-2">
-          <code class="flex-1 px-3 py-2 rounded-lg bg-black/5 dark:bg-white/10 font-mono text-lg tracking-wide">
-            {{ resetDialog.password }}
-          </code>
-          <p-button icon="pi pi-copy" severity="secondary" @click="copyPassword" />
-        </div>
-        <div class="flex justify-end">
-          <p-button label="Sluiten" @click="resetDialog.visible = false" />
-        </div>
-      </div>
-    </p-dialog>
   </div>
 </template>

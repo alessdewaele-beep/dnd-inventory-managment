@@ -28,8 +28,25 @@ class ItemService {
     return !!campaign && campaign.dungeon_master === requester.id;
   }
 
-  createItem(data) {
-    return itemRepository.create(data);
+  // `creator` is de ingelogde gebruiker. Voegt iemand anders dan de eigenaar
+  // het item toe (bv. een admin), dan krijgt de eigenaar een notificatie.
+  createItem(data, creator) {
+    const is_new = Number(data.userId) !== creator.id;
+    return itemRepository.create({ ...data, is_new });
+  }
+
+  // De eigenaar markeert een nieuw item als gezien (hover in de inventory).
+  async markItemSeen(requester, itemId) {
+    const item = await itemRepository.getById(itemId);
+    if (!item) return { error: "Item niet gevonden", status: 404 };
+    if (item.userId !== requester.id) {
+      return {
+        error: "Enkel de eigenaar kan een item als gezien markeren",
+        status: 403,
+      };
+    }
+    if (item.is_new) await itemRepository.markSeen(itemId);
+    return { item: { ...item, is_new: 0 } };
   }
 
   // De DM stuurt (een kopie van) een van zijn eigen items naar spelers uit
@@ -79,6 +96,7 @@ class ItemService {
         quantity: qty,
         favourite: 0,
         userId,
+        is_new: true, // ontvanger krijgt een notificatie in zijn inventory
       });
       created.push(item);
     }

@@ -1,4 +1,5 @@
 <script setup>
+import { onUnmounted } from "vue";
 import ItemFilterBar from "@/features/inventory/components/ItemFilterBar.vue";
 
 const props = defineProps({
@@ -19,15 +20,68 @@ const emit = defineEmits([
   "open-item",
   "delete-item",
   "send-item",
+  "seen-item",
 ]);
+
+// Nieuwe (nog niet geziene) items krijgen een rijmarkering. Het item-id zit
+// in de klassenaam zodat de hover-handler weet welk item gezien werd; de
+// DataTable zelf biedt geen row-hover event met rowdata aan.
+const rowClass = (data) => (data.is_new ? `row-new row-new-id-${data.id}` : null);
+
+// Gedelegeerde hover-handler op de wrapper. De eigenaar moet 3 seconden
+// onafgebroken over een nieuw item hoveren voordat de notificatie verdwijnt;
+// verlaat de muis de rij eerder, dan breekt de timer af en blijft de vlag aan.
+const HOVER_DELAY_MS = 3000;
+let hoverTimer = null;
+let hoverId = null;
+
+function clearHover() {
+  if (hoverTimer) {
+    clearTimeout(hoverTimer);
+    hoverTimer = null;
+  }
+  hoverId = null;
+}
+
+const onMouseOver = (event) => {
+  if (props.readonly) return;
+  const row = event.target.closest("tr.row-new");
+  // Geen nieuw item onder de muis: eventueel lopende timer afbreken.
+  if (!row) {
+    clearHover();
+    return;
+  }
+  const match = row.className.match(/row-new-id-(\d+)/);
+  if (!match) return;
+  const id = Number(match[1]);
+  // Zelfde rij: laat de lopende timer gewoon doortikken.
+  if (id === hoverId) return;
+  // Nieuwe rij: herstart de teller van 3 seconden.
+  clearHover();
+  hoverId = id;
+  hoverTimer = setTimeout(() => {
+    emit("seen-item", id);
+    clearHover();
+  }, HOVER_DELAY_MS);
+};
+
+// Muis verlaat de tabel volledig: timer afbreken.
+const onMouseLeave = () => clearHover();
+
+onUnmounted(clearHover);
 </script>
 
 <template>
-  <div class="rounded-xl overflow-hidden border-2 border-gold shadow-xl w-full">
+  <div
+    class="rounded-xl overflow-hidden border-2 border-gold shadow-xl w-full"
+    @mouseover="onMouseOver"
+    @mouseleave="onMouseLeave"
+  >
     <p-datatable
       v-model:filters="props.filters"
       :globalFilterFields="['name']"
       :value="props.items"
+      :row-class="rowClass"
       class="my-datatable"
       paginator
       :rows="10"
@@ -52,6 +106,12 @@ const emit = defineEmits([
       <p-column field="name" header="Name" headerClass="dt-col-left" style="width: 30%; min-width: 9rem">
         <template #body="slotProps">
           <span class="font-semibold">{{ slotProps.data.name }}</span>
+          <span
+            v-if="slotProps.data.is_new"
+            class="new-badge"
+            title="Nieuw item — verdwijnt zodra je erover hovert"
+            >Nieuw</span
+          >
         </template>
       </p-column>
       <p-column field="type" header="Type" headerClass="dt-col-left" style="width: 30%; min-width: 7rem">
@@ -252,5 +312,27 @@ const emit = defineEmits([
 .my-datatable .p-paginator .p-paginator-page.p-highlight {
   background-color: #b22222;
   color: #f5f5f5;
+}
+
+/* Nieuw (nog niet gezien) item: gouden gloed over de hele rij. Staat NA de
+   odd/even- en hover-regels zodat deze tint wint zolang de vlag aan staat;
+   hovert de eigenaar, dan valt `is_new` weg en verdwijnen tint en badge. */
+.my-datatable .p-datatable-tbody > tr.row-new,
+.my-datatable .p-datatable-tbody > tr.row-new:hover {
+  background-color: rgba(217, 180, 74, 0.22);
+  box-shadow: inset 3px 0 0 #d9b44a;
+}
+
+.new-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background-color: #d9b44a;
+  color: #2e2a26;
 }
 </style>

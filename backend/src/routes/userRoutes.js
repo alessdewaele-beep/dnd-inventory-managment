@@ -51,11 +51,4 @@ router.delete(
   userController.delete.bind(userController)
 );
 
-router.post(
-  "/:id/reset-password",
-  authenticate,
-  authorize("Admin"),
-  userController.resetPassword.bind(userController)
-);
-
 module.exports = router;

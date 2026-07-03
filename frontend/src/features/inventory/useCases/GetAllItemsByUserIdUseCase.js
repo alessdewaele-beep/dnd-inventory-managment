@@ -18,7 +18,8 @@ export default class GetAllItemsByUserIdUseCase {
           item.userId,
           item.quantity,
           item.created_at,
-          item.favourite
+          item.favourite,
+          item.is_new
         )
       );
     });

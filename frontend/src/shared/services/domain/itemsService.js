@@ -5,6 +5,7 @@ import AddItemUseCase from "@/features/inventory/useCases/AddItemUseCase";
 import UpdateItemUseCase from "@/features/inventory/useCases/UpdateItemUseCase";
 import DeleteItemUseCase from "@/features/inventory/useCases/DeleteItemUseCase";
 import SendItemUseCase from "@/features/inventory/useCases/SendItemUseCase";
+import MarkItemSeenUseCase from "@/features/inventory/useCases/MarkItemSeenUseCase";
 
 const repository = new ApiRepository();
 const getAllItemsByUserIdUseCase = new GetAllItemsByUserIdUseCase(repository);
@@ -12,6 +13,7 @@ const addItemUseCase = new AddItemUseCase(repository);
 const updateItemUseCase = new UpdateItemUseCase(repository);
 const deleteItemUseCase = new DeleteItemUseCase(repository);
 const sendItemUseCase = new SendItemUseCase(repository);
+const markItemSeenUseCase = new MarkItemSeenUseCase(repository);
 
 const state = reactive({
   items: [],
@@ -100,6 +102,36 @@ async function sendItem(item, recipientIds, quantity) {
   }
 }
 
+// De eigenaar hovert over een nieuw item: highlight meteen (optimistisch)
+// weghalen en de vlag op de backend uitzetten. Bij een fout zetten we ze
+// terug, zodat de server de waarheid blijft.
+async function markItemSeen(itemId) {
+  const item = state.items.find((i) => i.id === itemId);
+  if (!item || !item.is_new) return;
+  item.is_new = 0;
+  try {
+    await markItemSeenUseCase.execute(itemId);
+  } catch {
+    item.is_new = 1;
+  }
+}
+
+// Polling: haalt de inventory periodiek opnieuw op zodat items die intussen
+// door een admin of DM werden toegevoegd (met hun notificatie) verschijnen.
+let pollTimer = null;
+
+function startPolling(userId, intervalMs = 15000) {
+  stopPolling();
+  pollTimer = setInterval(() => fetchItems(userId), intervalMs);
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+}
+
 async function toggleFavourite(item) {
   item.favourite = !item.favourite;
   try {
@@ -123,6 +155,9 @@ export const itemsService = {
   updateItem,
   deleteItem,
   sendItem,
+  markItemSeen,
+  startPolling,
+  stopPolling,
   toggleFavourite,
   selectFilterWord,
 };

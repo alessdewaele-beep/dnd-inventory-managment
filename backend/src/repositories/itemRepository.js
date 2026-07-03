@@ -19,12 +19,25 @@ class ItemRepository {
   }
 
   async create(item) {
-    const { name, description, type, quantity, favourite, userId } = item;
+    const {
+      name,
+      description,
+      type,
+      quantity,
+      favourite,
+      userId,
+      is_new = false,
+    } = item;
     const [result] = await pool.query(
-      "INSERT INTO items (name, description, type, quantity, favourite, userId) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, description, type, quantity, favourite, userId]
+      "INSERT INTO items (name, description, type, quantity, favourite, userId, is_new) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [name, description, type, quantity, favourite, userId, is_new]
     );
-    return { id: result.insertId, ...item };
+    return { id: result.insertId, ...item, is_new };
+  }
+
+  // Eigenaar heeft het nieuwe item gezien: notificatievlag uitzetten.
+  async markSeen(id) {
+    await pool.query("UPDATE items SET is_new = FALSE WHERE id = ?", [id]);
   }
 
   async update(id, data) {

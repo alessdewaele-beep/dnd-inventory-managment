@@ -19,6 +19,10 @@ export default class DnDRepository {
     throw new Error("method not implemented", itemId);
   }
 
+  markItemSeen(itemId) {
+    throw new Error("method not implemented", itemId);
+  }
+
   getMyCampaignPlayers() {
     throw new Error("method not implemented");
   }
@@ -57,10 +61,6 @@ export default class DnDRepository {
   }
 
   updateUser(userId, data) {
-    throw new Error("method not implemented", userId);
-  }
-
-  resetUserPassword(userId) {
     throw new Error("method not implemented", userId);
   }
 

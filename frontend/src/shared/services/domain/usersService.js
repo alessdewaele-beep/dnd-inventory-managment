@@ -5,7 +5,6 @@ import GetCampaignPlayersUseCase from "@/features/inventory/useCases/GetCampaign
 import AdminGetAllUsersUseCase from "@/features/adminPanel/useCases/GetAllUsersUseCase";
 import DeleteUserUseCase from "@/features/adminPanel/useCases/DeleteUserUseCase";
 import UpdateUserUseCase from "@/features/adminPanel/useCases/UpdateUserUseCase";
-import ResetUserPasswordUseCase from "@/features/adminPanel/useCases/ResetUserPasswordUseCase";
 
 const repository = new ApiRepository();
 const getAllUsersUseCase = new GetAllUsersUseCase(repository);
@@ -13,7 +12,6 @@ const getCampaignPlayersUseCase = new GetCampaignPlayersUseCase(repository);
 const adminGetAllUsersUseCase = new AdminGetAllUsersUseCase(repository);
 const deleteUserUseCase = new DeleteUserUseCase(repository);
 const updateUserUseCase = new UpdateUserUseCase(repository);
-const resetUserPasswordUseCase = new ResetUserPasswordUseCase(repository);
 
 const state = reactive({
   users: [],
@@ -76,17 +74,6 @@ async function updateUser(userId, data) {
   }
 }
 
-// Geeft het gegenereerde tijdelijke wachtwoord terug (of null bij fout).
-async function resetPassword(userId) {
-  state.errorMessage = "";
-  try {
-    return await resetUserPasswordUseCase.execute(userId);
-  } catch (err) {
-    state.errorMessage = err.message || "Kon wachtwoord niet resetten";
-    return null;
-  }
-}
-
 export const usersService = {
   state,
   fetchUsers,
@@ -94,5 +81,4 @@ export const usersService = {
   fetchAdminUsers,
   deleteUser,
   updateUser,
-  resetPassword,
 };

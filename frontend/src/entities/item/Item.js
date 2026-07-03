@@ -7,7 +7,8 @@ class Item {
     userId,
     quantity,
     createdAt,
-    favourite = false
+    favourite = false,
+    isNew = false
   ) {
     this.id = id;
     this.name = name;
@@ -17,6 +18,7 @@ class Item {
     this.userId = userId;
     this.created_at = createdAt;
     this.favourite = favourite;
+    this.is_new = isNew;
   }
 
   isFavourite() {

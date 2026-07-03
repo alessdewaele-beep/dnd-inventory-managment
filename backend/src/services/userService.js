@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const userRepository = require("../repositories/userRepository");
 const campaignRepository = require("../repositories/campaignRepository");
 const { JWT_SECRET, JWT_EXPIRES_IN } = require("../config");
@@ -182,16 +181,6 @@ class UserService {
       role: updated.role,
       campaign_id: updated.campaign_id,
     };
-  }
-
-  // Genereert een tijdelijk wachtwoord, slaat het (gehasht) op en geeft het
-  // eenmalig terug zodat de admin het aan de speler kan doorgeven.
-  async resetPassword(id) {
-    const user = await userRepository.findById(id);
-    if (!user) return null;
-    const tempPassword = crypto.randomBytes(6).toString("hex"); // 12 tekens
-    await userRepository.updatePassword(id, tempPassword);
-    return { id: user.id, username: user.username, password: tempPassword };
   }
 
   // Mag `requester` de spelers van deze campaign opvragen?
