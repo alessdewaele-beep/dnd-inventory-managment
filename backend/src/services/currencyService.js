@@ -6,9 +6,9 @@ const COINS = ["pp", "gp", "sp", "cp"];
 const EMPTY = { pp: 0, gp: 0, sp: 0, cp: 0 };
 
 class CurrencyService {
-  // Mag `requester` het geld van gebruiker `targetUserId` bekijken/bewerken?
-  // Zelfde regel als de inventory: de gebruiker zelf, een admin, of de DM van
-  // diens campaign. Bekijken == bewerken (gekozen rechtenmodel).
+  // May `requester` view/edit the money of user `targetUserId`?
+  // Same rule as the inventory: the user themselves, an admin, or the DM of
+  // their campaign. Viewing == editing (chosen permission model).
   async canManage(requester, targetUserId) {
     if (requester.id === targetUserId) return true;
     if (requester.role === "Admin") return true;
@@ -20,7 +20,7 @@ class CurrencyService {
     return !!campaign && campaign.dungeon_master === requester.id;
   }
 
-  // Geeft de beurs terug; bestaat er nog geen rij, dan alles op 0.
+  // Returns the purse; if no row exists yet, everything is 0.
   async getForUser(userId) {
     const row = await currencyRepository.getByUserId(userId);
     return row
@@ -28,15 +28,15 @@ class CurrencyService {
       : { ...EMPTY };
   }
 
-  // Valideert en slaat de vier muntaantallen op. Retourneert {error,status}
-  // bij ongeldige invoer, anders {currency}.
+  // Validates and saves the four coin amounts. Returns {error,status}
+  // on invalid input, otherwise {currency}.
   async setForUser(userId, coins) {
     const clean = {};
     for (const coin of COINS) {
       const value = Number(coins?.[coin]);
       if (!Number.isInteger(value) || value < 0) {
         return {
-          error: `Ongeldig aantal voor ${coin}: enkel gehele getallen ≥ 0`,
+          error: `Invalid amount for ${coin}: only integers ≥ 0`,
           status: 400,
         };
       }

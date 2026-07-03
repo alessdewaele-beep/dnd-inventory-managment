@@ -3,8 +3,8 @@ const router = express.Router();
 const currencyController = require("../controllers/currencyController");
 const { authenticate } = require("../middleware/auth");
 
-// Alle currency-routes vereisen een geldige token; de fijnmazige controle
-// (eigenaar/DM/admin) gebeurt in de service via canManage.
+// All currency routes require a valid token; the fine-grained check
+// (owner/DM/admin) happens in the service via canManage.
 router.use(authenticate);
 
 router.get("/:userId", currencyController.getByUserId.bind(currencyController));

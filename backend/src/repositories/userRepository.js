@@ -36,7 +36,7 @@ class UserRepository {
     return rows;
   }
 
-  // Bewust zonder password_hash: deze lijst gaat naar de admin-client.
+  // Deliberately without password_hash: this list goes to the admin client.
   async getAll() {
     const [rows] = await pool.query(
       "SELECT id, username, role, campaign_id, created_at FROM users ORDER BY created_at DESC"
@@ -51,7 +51,7 @@ class UserRepository {
     return { id: user.id, username: user.username };
   }
 
-  // Dynamische update; enkel de meegegeven kolommen (bv. role, campaign_id).
+  // Dynamic update; only the provided columns (e.g. role, campaign_id).
   async update(id, data) {
     const fields = [];
     const values = [];

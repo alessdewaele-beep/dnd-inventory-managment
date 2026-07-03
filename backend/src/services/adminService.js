@@ -3,7 +3,7 @@ const campaignRepository = require("../repositories/campaignRepository");
 const itemRepository = require("../repositories/itemRepository");
 
 class AdminService {
-  // Verzamelt alle cijfers voor het admin-dashboard in één keer.
+  // Collects all the figures for the admin dashboard in one go.
   async getStats() {
     const [
       totalUsers,

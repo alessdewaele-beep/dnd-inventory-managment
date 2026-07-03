@@ -1,4 +1,4 @@
-// Wijzigt het eigen wachtwoord; vereist het huidige wachtwoord.
+// Changes the user's own password; requires the current password.
 export default class ChangePasswordUseCase {
   constructor(repository) {
     this.repository = repository;

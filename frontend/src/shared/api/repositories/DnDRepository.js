@@ -38,7 +38,7 @@ export default class DnDRepository {
     throw new Error("method not implemented");
   }
 
-  // --- Self-service profiel ---
+  // --- Self-service profile ---
   getMe() {
     throw new Error("method not implemented");
   }
@@ -55,7 +55,7 @@ export default class DnDRepository {
     throw new Error("method not implemented");
   }
 
-  // --- Admin: gebruikers ---
+  // --- Admin: users ---
   deleteUser(userId) {
     throw new Error("method not implemented", userId);
   }
@@ -64,7 +64,7 @@ export default class DnDRepository {
     throw new Error("method not implemented", userId);
   }
 
-  // --- Admin: campagnes ---
+  // --- Admin: campaigns ---
   getAllCampaigns() {
     throw new Error("method not implemented");
   }

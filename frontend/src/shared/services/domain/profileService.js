@@ -10,16 +10,16 @@ const getMeUseCase = new GetMeUseCase(repository);
 const updateProfileUseCase = new UpdateProfileUseCase(repository);
 const changePasswordUseCase = new ChangePasswordUseCase(repository);
 
-// Gedeelde profielstaat: door AppNavbar (campagne-context) en de profielpagina.
+// Shared profile state: used by AppNavbar (campaign context) and the profile page.
 const state = reactive({
   me: null, // { id, username, role, campaign_id, campaign_name, backstory }
   errorMessage: "",
   loading: false,
 });
 
-// Haalt het eigen profiel op. `force` omzeilt de cache (bv. na een wijziging).
-// De cache is gekoppeld aan de huidige token-id, zodat een andere gebruiker
-// nooit het profiel van de vorige sessie te zien krijgt.
+// Fetches your own profile. `force` bypasses the cache (e.g. after a change).
+// The cache is tied to the current token id, so a different user never
+// sees the profile from the previous session.
 async function fetchMe(force = false) {
   if (!authService.isLoggedIn()) return null;
   const currentId = authService.getUserId();
@@ -31,15 +31,15 @@ async function fetchMe(force = false) {
     state.me = await getMeUseCase.execute();
     return state.me;
   } catch (err) {
-    state.errorMessage = err.message || "Kon profiel niet laden";
+    state.errorMessage = err.message || "Could not load profile";
     return null;
   } finally {
     state.loading = false;
   }
 }
 
-// Werkt username en/of backstory bij. Bij een username-wijziging wordt de
-// verse token opgeslagen zodat de sessie in sync blijft.
+// Updates the username and/or backstory. On a username change the fresh
+// token is stored so the session stays in sync.
 async function updateProfile(data) {
   state.errorMessage = "";
   try {
@@ -50,7 +50,7 @@ async function updateProfile(data) {
     state.me = result?.user ?? state.me;
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon profiel niet bijwerken";
+    state.errorMessage = err.message || "Could not update profile";
     return false;
   }
 }
@@ -61,12 +61,12 @@ async function changePassword(currentPassword, newPassword) {
     await changePasswordUseCase.execute(currentPassword, newPassword);
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon wachtwoord niet wijzigen";
+    state.errorMessage = err.message || "Could not change password";
     return false;
   }
 }
 
-// Wist de gecachte profielstaat (bij uitloggen).
+// Clears the cached profile state (on logout).
 function clear() {
   state.me = null;
   state.errorMessage = "";

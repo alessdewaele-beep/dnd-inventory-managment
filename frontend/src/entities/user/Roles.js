@@ -1,7 +1,6 @@
-// Rol-strings gelijkgetrokken met de backend/JWT: "Admin", "Player", "DM".
-// (De sleutel SPELER blijft behouden voor bestaande imports.)
+// Role strings aligned with the backend/JWT: "Admin", "Player", "DM".
 export const Roles = Object.freeze({
   ADMIN: "Admin",
-  SPELER: "Player",
+  PLAYER: "Player",
   DM: "DM",
 });

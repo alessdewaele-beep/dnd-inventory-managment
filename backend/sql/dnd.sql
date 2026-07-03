@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db:3306
--- Gegenereerd op: 17 mei 2026 om 10:41
--- Serverversie: 8.0.46
--- PHP-versie: 8.3.26
+-- Generated on: 17 May 2026 at 10:41
+-- Server version: 8.0.46
+-- PHP version: 8.3.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `items`
+-- Table structure for table `items`
 --
 
 CREATE TABLE `items` (
@@ -39,7 +39,7 @@ CREATE TABLE `items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Gegevens worden geëxporteerd voor tabel `items`
+-- Data being exported for table `items`
 --
 
 INSERT INTO `items` (`id`, `name`, `description`, `type`, `created_at`, `userId`, `favourite`, `quantity`) VALUES
@@ -68,7 +68,7 @@ INSERT INTO `items` (`id`, `name`, `description`, `type`, `created_at`, `userId`
 -- --------------------------------------------------------
 
 --
--- Tabelstructuur voor tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -80,7 +80,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Gegevens worden geëxporteerd voor tabel `users`
+-- Data being exported for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password_hash`, `created_at`, `Role`) VALUES
@@ -90,34 +90,34 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `created_at`, `Role`) VA
 (13, 'Dorel', '$2b$10$UeK6YI0yoArkjquHnqw98u/DLUmKehhh/NZ8EcaIa8YE0/HRWpAv2', '2025-12-06 18:11:58', 'Player');
 
 --
--- Indexen voor geëxporteerde tabellen
+-- Indexes for exported tables
 --
 
 --
--- Indexen voor tabel `items`
+-- Indexes for table `items`
 --
 ALTER TABLE `items`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexen voor tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT voor geëxporteerde tabellen
+-- AUTO_INCREMENT for exported tables
 --
 
 --
--- AUTO_INCREMENT voor een tabel `items`
+-- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
--- AUTO_INCREMENT voor een tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;

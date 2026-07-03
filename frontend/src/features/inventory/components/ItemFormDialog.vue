@@ -5,7 +5,7 @@ import { typeIcon } from "@/entities/item/itemIcon";
 const props = defineProps({
   visible: { type: Boolean, required: true },
   item: { type: Object, required: true },
-  // Bekijkmodus: geen upload/wijzigen van de foto (DM/admin die meekijkt).
+  // View mode: no upload/changing of the photo (DM/admin who is looking on).
   readonly: { type: Boolean, default: false },
 });
 
@@ -22,11 +22,11 @@ const typeOptions = [
   { label: "Misc", value: "misc" },
 ];
 
-// --- Foto-upload ---
-// De afbeelding wordt client-side verkleind en als data-URI (base64) op het
-// item gezet; de backend slaat die string op. Zo is er geen externe
-// bestandsopslag nodig en blijft de payload klein.
-const MAX_DIM = 512; // langste zijde in px
+// --- Photo upload ---
+// The image is resized client-side and set on the item as a data URI (base64);
+// the backend stores that string. This way no external file storage is needed
+// and the payload stays small.
+const MAX_DIM = 512; // longest side in px
 const JPEG_QUALITY = 0.8;
 
 const fileInput = ref(null);
@@ -36,11 +36,11 @@ const pickFile = () => fileInput.value?.click();
 
 const onFileChange = (event) => {
   const file = event.target.files?.[0];
-  // Reset meteen zodat hetzelfde bestand nadien opnieuw gekozen kan worden.
+  // Reset immediately so the same file can be selected again afterwards.
   event.target.value = "";
   if (!file) return;
   if (!file.type.startsWith("image/")) {
-    uploadError.value = "Kies een afbeeldingsbestand.";
+    uploadError.value = "Choose an image file.";
     return;
   }
   uploadError.value = "";
@@ -61,19 +61,19 @@ const onFileChange = (event) => {
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext("2d");
-      // Witte ondergrond: transparante PNG's worden anders zwart in JPEG.
+      // White background: transparent PNGs otherwise turn black in JPEG.
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
       props.item.image = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
     };
     img.onerror = () => {
-      uploadError.value = "Kon de afbeelding niet lezen.";
+      uploadError.value = "Could not read the image.";
     };
     img.src = reader.result;
   };
   reader.onerror = () => {
-    uploadError.value = "Kon het bestand niet lezen.";
+    uploadError.value = "Could not read the file.";
   };
   reader.readAsDataURL(file);
 };
@@ -83,7 +83,7 @@ const removeImage = () => {
   uploadError.value = "";
 };
 
-// Vergrote weergave van de foto (klik op de preview in dit detailscherm).
+// Enlarged view of the photo (click the preview in this detail screen).
 const previewVisible = ref(false);
 const openPreview = () => {
   if (props.item.image) previewVisible.value = true;
@@ -112,7 +112,7 @@ const save = () => emit("save");
     </template>
 
     <div class="flex flex-col gap-4 pt-2">
-      <!-- Foto: preview + upload/verwijderen -->
+      <!-- Photo: preview + upload/remove -->
       <div class="flex flex-col gap-1">
         <label class="text-sm font-medium">Photo</label>
         <div class="flex items-center gap-4">
@@ -123,9 +123,9 @@ const save = () => emit("save");
             <img
               v-if="item.image"
               :src="item.image"
-              alt="Item foto"
+              alt="Item photo"
               class="w-full h-full object-cover cursor-zoom-in"
-              title="Klik om te vergroten"
+              title="Click to enlarge"
               @click="openPreview"
             />
             <span
@@ -219,7 +219,7 @@ const save = () => emit("save");
     </div>
   </p-dialog>
 
-  <!-- Vergrote weergave van de foto -->
+  <!-- Enlarged view of the photo -->
   <p-dialog
     v-model:visible="previewVisible"
     modal

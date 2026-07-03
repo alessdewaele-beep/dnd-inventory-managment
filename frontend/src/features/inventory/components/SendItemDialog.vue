@@ -3,9 +3,9 @@ import { ref, watch } from "vue";
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
-  // Het bronitem dat de DM verstuurt (of null als er nog geen gekozen is).
+  // The source item the DM sends (or null if none has been chosen yet).
   item: { type: Object, default: null },
-  // Spelers uit de campaign van de DM: [{ id, username, role }].
+  // Players from the DM's campaign: [{ id, username, role }].
   players: { type: Array, required: true },
 });
 
@@ -15,7 +15,7 @@ const recipientIds = ref([]);
 const quantity = ref(1);
 const error = ref("");
 
-// Reset de velden telkens de dialog opent voor een (nieuw) item.
+// Reset the fields every time the dialog opens for a (new) item.
 watch(
   () => props.visible,
   (open) => {
@@ -31,11 +31,11 @@ const close = () => emit("update:visible", false);
 
 const confirm = () => {
   if (recipientIds.value.length === 0) {
-    error.value = "Kies minstens één speler.";
+    error.value = "Choose at least one player.";
     return;
   }
   if (!quantity.value || quantity.value < 1) {
-    error.value = "Aantal moet minstens 1 zijn.";
+    error.value = "Quantity must be at least 1.";
     return;
   }
   emit("confirm", {
@@ -55,37 +55,37 @@ const confirm = () => {
     <template #header>
       <span class="font-serif text-lg flex items-center gap-2">
         <i class="pi pi-send"></i>
-        Item versturen
+        Send item
       </span>
     </template>
 
     <div class="flex flex-col gap-4 pt-2">
       <p v-if="props.item" class="text-sm">
-        Je stuurt een kopie van
+        You are sending a copy of
         <span class="font-semibold">{{ props.item.name }}</span>
-        naar de gekozen spelers. Jouw eigen item blijft behouden.
+        to the selected players. Your own item is kept.
       </p>
 
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium">Spelers</label>
+        <label class="text-sm font-medium">Players</label>
         <p-multiselect
           v-model="recipientIds"
           :options="props.players"
           option-label="username"
           option-value="id"
-          placeholder="Kies spelers"
+          placeholder="Choose players"
           filter
           class="w-full"
         />
       </div>
 
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium">Aantal (per speler)</label>
+        <label class="text-sm font-medium">Quantity (per player)</label>
         <p-inputnumber
           v-model="quantity"
           :min="1"
           showButtons
-          placeholder="Aantal"
+          placeholder="Quantity"
           class="w-full"
         />
       </div>
@@ -93,9 +93,9 @@ const confirm = () => {
       <p v-if="error" class="text-sm text-blood">{{ error }}</p>
 
       <div class="flex justify-end gap-2 mt-2">
-        <p-button label="Annuleren" severity="secondary" @click="close" />
+        <p-button label="Cancel" severity="secondary" @click="close" />
         <p-button
-          label="Versturen"
+          label="Send"
           icon="pi pi-send"
           class="dt-primary-btn"
           @click="confirm"

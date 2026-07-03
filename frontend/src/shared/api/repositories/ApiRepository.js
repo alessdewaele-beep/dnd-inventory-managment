@@ -18,17 +18,17 @@ export default class ApiRepository extends DnDRepository {
     return Client.put("items", item.id, item);
   }
 
-  // DM: verstuur (kopieer) een item naar spelers uit de eigen campaign.
+  // DM: send (copy) an item to players from the own campaign.
   async sendItem(itemId, payload) {
     return Client.post(`items/${itemId}/send`, payload);
   }
 
-  // Eigenaar heeft een nieuw item gezien: notificatievlag uitzetten.
+  // Owner has seen a new item: turn off the notification flag.
   async markItemSeen(itemId) {
     return Client.patch(`items/${itemId}/seen`, null, null);
   }
 
-  // DM: spelers uit de eigen campaign(s).
+  // DM: players from the own campaign(s).
   async getMyCampaignPlayers() {
     return Client.getAll("users/my-campaign-players");
   }
@@ -45,7 +45,7 @@ export default class ApiRepository extends DnDRepository {
     return Client.get("/users");
   }
 
-  // --- Self-service profiel ---
+  // --- Self-service profile ---
   async getMe() {
     return Client.getAll("users/me");
   }
@@ -62,7 +62,7 @@ export default class ApiRepository extends DnDRepository {
     return Client.getAll("campaigns/public");
   }
 
-  // --- Admin: gebruikers ---
+  // --- Admin: users ---
   async deleteUser(userId) {
     return Client.delete("users", userId);
   }
@@ -71,7 +71,7 @@ export default class ApiRepository extends DnDRepository {
     return Client.put("users", userId, data);
   }
 
-  // --- Admin: campagnes ---
+  // --- Admin: campaigns ---
   async getAllCampaigns() {
     return Client.getAll("campaigns");
   }
@@ -97,7 +97,7 @@ export default class ApiRepository extends DnDRepository {
     return Client.getAll("admin/stats");
   }
 
-  // --- Currency: muntenbeurs van een gebruiker ---
+  // --- Currency: a user's coin purse ---
   async getCurrency(userId) {
     return Client.getAll(`currencies/${userId}`);
   }

@@ -1,5 +1,5 @@
-// Koppelt een gebruiker als DM aan een campagne (userId mag null zijn om los
-// te koppelen). De backend zet meteen de rol van die gebruiker op 'DM'.
+// Assigns a user as DM to a campaign (userId may be null to unassign).
+// The backend immediately sets that user's role to 'DM'.
 export default class AssignDungeonMasterUseCase {
   constructor(repository) {
     this.repository = repository;

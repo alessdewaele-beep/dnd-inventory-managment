@@ -21,7 +21,7 @@ async function fetchCurrency(userId) {
   try {
     apply(await getCurrencyUseCase.execute(userId));
   } catch (err) {
-    state.errorMessage = err.message || "Kon het geld niet laden";
+    state.errorMessage = err.message || "Could not load money";
   }
 }
 
@@ -31,7 +31,7 @@ async function saveCurrency(userId, coins) {
     apply(await updateCurrencyUseCase.execute(userId, coins));
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon het geld niet opslaan";
+    state.errorMessage = err.message || "Could not save money";
     return false;
   }
 }

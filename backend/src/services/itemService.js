@@ -15,11 +15,11 @@ class ItemService {
     return itemRepository.getByUserId(userId);
   }
 
-  // Mag `requester` de inventory van gebruiker `targetUserId` bekijken?
-  // Toegestaan als het de gebruiker zelf is, of de DM van diens campaign.
+  // May `requester` view the inventory of user `targetUserId`?
+  // Allowed if it is the user themselves, or the DM of their campaign.
   async canViewInventory(requester, targetUserId) {
-    if (requester.id === targetUserId) return true; // eigen inventory
-    if (requester.role === "Admin") return true; // admin beheert alles
+    if (requester.id === targetUserId) return true; // own inventory
+    if (requester.role === "Admin") return true; // admin manages everything
 
     const target = await userRepository.findById(targetUserId);
     if (!target || !target.campaign_id) return false;
@@ -28,20 +28,20 @@ class ItemService {
     return !!campaign && campaign.dungeon_master === requester.id;
   }
 
-  // `creator` is de ingelogde gebruiker. Voegt iemand anders dan de eigenaar
-  // het item toe (bv. een admin), dan krijgt de eigenaar een notificatie.
+  // `creator` is the logged-in user. If someone other than the owner adds
+  // the item (e.g. an admin), the owner receives a notification.
   createItem(data, creator) {
     const is_new = Number(data.userId) !== creator.id;
     return itemRepository.create({ ...data, is_new });
   }
 
-  // De eigenaar markeert een nieuw item als gezien (hover in de inventory).
+  // The owner marks a new item as seen (hover in the inventory).
   async markItemSeen(requester, itemId) {
     const item = await itemRepository.getById(itemId);
-    if (!item) return { error: "Item niet gevonden", status: 404 };
+    if (!item) return { error: "Item not found", status: 404 };
     if (item.userId !== requester.id) {
       return {
-        error: "Enkel de eigenaar kan een item als gezien markeren",
+        error: "Only the owner can mark an item as seen",
         status: 403,
       };
     }
@@ -49,26 +49,26 @@ class ItemService {
     return { item: { ...item, is_new: 0 } };
   }
 
-  // De DM stuurt (een kopie van) een van zijn eigen items naar spelers uit
-  // zijn campaign. Het bronitem blijft ongewijzigd; per ontvanger wordt een
-  // nieuw item aangemaakt met het gekozen aantal.
+  // The DM sends (a copy of) one of their own items to players from their
+  // campaign. The source item stays unchanged; a new item is created per
+  // recipient with the chosen quantity.
   async sendItemToPlayers(dm, itemId, recipientIds, quantity) {
     const qty = Number(quantity);
     if (!Number.isInteger(qty) || qty <= 0) {
-      return { error: "Ongeldig aantal", status: 400 };
+      return { error: "Invalid quantity", status: 400 };
     }
     if (!Array.isArray(recipientIds) || recipientIds.length === 0) {
-      return { error: "Geen ontvangers geselecteerd", status: 400 };
+      return { error: "No recipients selected", status: 400 };
     }
 
     const source = await itemRepository.getById(itemId);
-    if (!source) return { error: "Item niet gevonden", status: 404 };
+    if (!source) return { error: "Item not found", status: 404 };
     if (source.userId !== dm.id) {
-      return { error: "Je kan enkel je eigen items versturen", status: 403 };
+      return { error: "You can only send your own items", status: 403 };
     }
 
-    // Bouw de set van geldige ontvangers: spelers uit de campagne(s) die deze
-    // DM leidt, exclusief de DM zelf.
+    // Build the set of valid recipients: players from the campaign(s) that this
+    // DM leads, excluding the DM themselves.
     const campaigns = await campaignRepository.getByDungeonMaster(dm.id);
     const validPlayerIds = new Set();
     for (const campaign of campaigns) {
@@ -82,7 +82,7 @@ class ItemService {
     const invalid = targets.filter((id) => !validPlayerIds.has(id));
     if (invalid.length > 0) {
       return {
-        error: "Eén of meer ontvangers zitten niet in jouw campaign",
+        error: "One or more recipients are not in your campaign",
         status: 403,
       };
     }
@@ -96,8 +96,8 @@ class ItemService {
         quantity: qty,
         favourite: 0,
         userId,
-        image: source.image, // verstuurd item behoudt zijn foto
-        is_new: true, // ontvanger krijgt een notificatie in zijn inventory
+        image: source.image, // sent item keeps its photo
+        is_new: true, // recipient gets a notification in their inventory
       });
       created.push(item);
     }

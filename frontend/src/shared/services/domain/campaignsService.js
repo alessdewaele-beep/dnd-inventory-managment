@@ -19,7 +19,7 @@ const state = reactive({
   errorMessage: "",
 });
 
-// Haalt de publieke campagnelijst (id + naam) op voor de registratie-select.
+// Fetches the public campaign list (id + name) for the registration select.
 async function fetchPublicCampaigns() {
   state.errorMessage = "";
   try {
@@ -29,13 +29,13 @@ async function fetchPublicCampaigns() {
   }
 }
 
-// Volledige campagnelijst (incl. beschrijving + dungeon_master) voor admin.
+// Full campaign list (incl. description + dungeon_master) for admin.
 async function fetchAllCampaigns() {
   state.errorMessage = "";
   try {
     state.allCampaigns = await getAllCampaignsUseCase.execute();
   } catch (err) {
-    state.errorMessage = err.message || "Kon campagnes niet laden";
+    state.errorMessage = err.message || "Could not load campaigns";
   }
 }
 
@@ -46,7 +46,7 @@ async function createCampaign(data) {
     await fetchAllCampaigns();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon campagne niet aanmaken";
+    state.errorMessage = err.message || "Could not create campaign";
     return false;
   }
 }
@@ -58,7 +58,7 @@ async function updateCampaign(campaignId, data) {
     await fetchAllCampaigns();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon campagne niet bijwerken";
+    state.errorMessage = err.message || "Could not update campaign";
     return false;
   }
 }
@@ -70,12 +70,12 @@ async function deleteCampaign(campaignId) {
     await fetchAllCampaigns();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon campagne niet verwijderen";
+    state.errorMessage = err.message || "Could not delete campaign";
     return false;
   }
 }
 
-// Koppelt (of ontkoppelt met userId = null) een DM aan een campagne.
+// Assigns (or unassigns with userId = null) a DM to a campaign.
 async function assignDungeonMaster(campaignId, userId) {
   state.errorMessage = "";
   try {
@@ -83,7 +83,7 @@ async function assignDungeonMaster(campaignId, userId) {
     await fetchAllCampaigns();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon DM niet toewijzen";
+    state.errorMessage = err.message || "Could not assign DM";
     return false;
   }
 }

@@ -6,7 +6,7 @@ class CampaignRepository {
     return rows;
   }
 
-  // Minimale, publiek deelbare lijst (voor de registratie-select).
+  // Minimal, publicly shareable list (for the registration select).
   async getAllPublic() {
     const [rows] = await pool.query("SELECT id, name FROM campaigns");
     return rows;
@@ -20,8 +20,8 @@ class CampaignRepository {
   }
 
   async create(campaign) {
-    // De DM wordt pas na registratie van de karakters aangesteld,
-    // dus dungeon_master is bij het aanmaken doorgaans nog leeg.
+    // The DM is only appointed after the characters have registered,
+    // so dungeon_master is usually still empty at creation time.
     const { name, description, dungeon_master = null } = campaign;
     const [result] = await pool.query(
       "INSERT INTO campaigns (name, description, dungeon_master) VALUES (?, ?, ?)",
@@ -81,7 +81,7 @@ class CampaignRepository {
     return rows[0].total;
   }
 
-  // Campagnes waarvan `userId` de dungeon master is.
+  // Campaigns for which `userId` is the dungeon master.
   async getByDungeonMaster(userId) {
     const [rows] = await pool.query(
       "SELECT * FROM campaigns WHERE dungeon_master = ?",
@@ -90,7 +90,7 @@ class CampaignRepository {
     return rows;
   }
 
-  // Aantal (andere) campagnes waarvan `userId` nog DM is, exclusief `exceptId`.
+  // Number of (other) campaigns where `userId` is still DM, excluding `exceptId`.
   async countByDungeonMaster(userId, exceptId) {
     const [rows] = await pool.query(
       "SELECT COUNT(*) AS total FROM campaigns WHERE dungeon_master = ? AND id <> ?",

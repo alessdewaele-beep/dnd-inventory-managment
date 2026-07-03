@@ -1,5 +1,5 @@
-// Haalt de volledige gebruikerslijst op als ruwe objecten
-// (id, username, role, campaign_id, created_at) voor het admin-beheer.
+// Fetches the full user list as raw objects
+// (id, username, role, campaign_id, created_at) for admin management.
 export default class GetAllUsersUseCase {
   constructor(repository) {
     this.repository = repository;

@@ -36,7 +36,7 @@ class ItemRepository {
     return { id: result.insertId, ...item, is_new, image };
   }
 
-  // Eigenaar heeft het nieuwe item gezien: notificatievlag uitzetten.
+  // Owner has seen the new item: turn off the notification flag.
   async markSeen(id) {
     await pool.query("UPDATE items SET is_new = FALSE WHERE id = ?", [id]);
   }

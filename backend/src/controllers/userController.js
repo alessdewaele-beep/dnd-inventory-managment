@@ -22,7 +22,7 @@ class UserController {
   }
 
   async profile(req, res) {
-    // req.user wordt gezet door de authenticate-middleware op de route.
+    // req.user is set by the authenticate middleware on the route.
     res.json({
       id: req.user.id,
       username: req.user.username,
@@ -30,20 +30,20 @@ class UserController {
     });
   }
 
-  // Eigen profiel incl. campagne-naam en backstory (leest de DB, i.t.t. /profile).
+  // Own profile incl. campaign name and backstory (reads the DB, unlike /profile).
   async me(req, res) {
     try {
       const profile = await service.getMe(req.user.id);
       if (!profile)
-        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+        return res.status(404).json({ error: "User not found" });
       res.json(profile);
     } catch (err) {
       res.status(err.status || 400).json({ error: err.message });
     }
   }
 
-  // Self-service: eigen username en/of backstory aanpassen.
-  // Bij een username-wijziging komt er een verse token mee terug.
+  // Self-service: update own username and/or backstory.
+  // On a username change, a fresh token is returned along with it.
   async updateMe(req, res) {
     try {
       const result = await service.updateSelf(req.user, req.body);
@@ -53,7 +53,7 @@ class UserController {
     }
   }
 
-  // Self-service: wachtwoord wijzigen (huidig wachtwoord vereist).
+  // Self-service: change password (current password required).
   async changePassword(req, res) {
     try {
       const { currentPassword, newPassword } = req.body;
@@ -77,7 +77,7 @@ class UserController {
     try {
       const deleted = await service.deleteUser(Number(req.params.id));
       if (!deleted)
-        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+        return res.status(404).json({ error: "User not found" });
       res.json(deleted);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -88,7 +88,7 @@ class UserController {
     try {
       const updated = await service.updateUser(Number(req.params.id), req.body);
       if (!updated)
-        return res.status(404).json({ error: "Gebruiker niet gevonden" });
+        return res.status(404).json({ error: "User not found" });
       res.json(updated);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -112,7 +112,7 @@ class UserController {
         campaignId
       );
       if (!allowed)
-        return res.status(403).json({ error: "Onvoldoende rechten" });
+        return res.status(403).json({ error: "Insufficient permissions" });
 
       const players = await service.getPlayersByCampaign(campaignId);
       res.json(players);

@@ -11,7 +11,7 @@ class CurrencyRepository {
     return rows[0] || null;
   }
 
-  // Eén rij per gebruiker: aanmaken of overschrijven.
+  // One row per user: create or overwrite.
   async upsert(userId, coins) {
     const values = COINS.map((c) => coins[c]);
     await pool.query(

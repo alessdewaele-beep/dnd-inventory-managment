@@ -1,7 +1,7 @@
-// Standaard-icoon (emoji) per itemtype, getoond wanneer een item (nog) geen
-// eigen foto heeft. PrimeIcons bevat geen fantasy-glyphs (zwaard, drankje, ...),
-// daarom een emoji: dekt alle types zonder extra assets. Robuust tegen de
-// samengestelde types ("weapon melee", "armor heavy", ...).
+// Default icon (emoji) per item type, shown when an item does not (yet) have
+// its own photo. PrimeIcons has no fantasy glyphs (sword, potion, ...),
+// hence an emoji: covers all types without extra assets. Robust against the
+// compound types ("weapon melee", "armor heavy", ...).
 export function typeIcon(type) {
   if (!type) return "📦";
   const t = String(type).toLowerCase();
@@ -9,5 +9,5 @@ export function typeIcon(type) {
   if (t.startsWith("armor")) return "🛡️";
   if (t === "potion") return "🧪";
   if (t === "jewelry") return "💍";
-  return "📦"; // misc / onbekend
+  return "📦"; // misc / unknown
 }

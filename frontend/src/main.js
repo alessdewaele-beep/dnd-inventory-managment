@@ -24,9 +24,9 @@ import InputIcon from "primevue/inputicon";
 import IconField from "primevue/iconfield";
 import "./assets/main.css";
 
-// Aura's standaard-primary is emerald-groen; die kleurt overal door in
-// focus-randen, geselecteerde opties, highlights ... Hier vervangen we hem
-// door de gouden huisstijlkleur (#d9b44a) zodat alles in lijn ligt.
+// Aura's default primary is emerald green; it bleeds through everywhere in
+// focus borders, selected options, highlights ... Here we replace it
+// with the gold brand color (#d9b44a) so everything stays consistent.
 const GoldAura = definePreset(Aura, {
   semantic: {
     primary: {

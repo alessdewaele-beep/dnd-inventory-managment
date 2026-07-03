@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A D&D inventory management app. Players track items; DMs view their campaign's players' inventories; Admins manage everything. Monorepo with two independent apps: `backend/` (Express 5 + MySQL) and `frontend/` (Vue 3 + Vite). Code comments and user-facing strings are in Dutch.
+A D&D inventory management app. Players track items; DMs view their campaign's players' inventories; Admins manage everything. Monorepo with two independent apps: `backend/` (Express 5 + MySQL) and `frontend/` (Vue 3 + Vite). Code comments and user-facing strings are in English.
 
 ## Commands
 
@@ -69,8 +69,8 @@ Key conventions:
 
 Role strings differ across the codebase and are a live source of bugs:
 - Backend/JWT and route guards use `"Admin"`, `"Player"`, and DM is expressed implicitly (a user is a campaign's `dungeon_master_id`).
-- `frontend/src/entities/user/Roles.js` defines `ADMIN: "admin"`, `SPELER: "Player"`, `DM: "DM"`.
-- `useRightManager.js` keys its hierarchy on `Speler`/`DM`/`Admin`.
+- `frontend/src/entities/user/Roles.js` defines `ADMIN: "Admin"`, `PLAYER: "Player"`, `DM: "DM"`.
+- `useRightManager.js` keys its hierarchy on `Player`/`DM`/`Admin`.
 
 When touching authorization, check the exact string each side actually compares against rather than assuming consistency.
 

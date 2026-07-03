@@ -26,9 +26,9 @@ class CampaignService {
     return campaignRepository.delete(id);
   }
 
-  // Wijst een gebruiker aan als DM van een campagne. De gebruiker krijgt rol
-  // 'DM'; een eventuele vorige DM (die geen andere campagne beheert) valt terug
-  // naar 'Player'. userId mag null zijn om de DM los te koppelen.
+  // Appoints a user as DM of a campaign. The user is given the role
+  // 'DM'; any previous DM (who does not manage another campaign) falls back
+  // to 'Player'. userId may be null to unassign the DM.
   async assignDungeonMaster(campaignId, userId) {
     const campaign = await campaignRepository.getById(campaignId);
     if (!campaign) return null;

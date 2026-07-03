@@ -1,5 +1,5 @@
--- Foto van een item, opgeslagen als data-URI (base64) i.p.v. een externe
--- bestandsopslag: werkt op Render (ephemeral filesystem) en past op de
--- bestaande JSON-Client. De frontend verkleint de afbeelding vóór het uploaden,
--- dus de tekst blijft klein; LONGTEXT geeft ruime marge.
+-- Photo of an item, stored as a data-URI (base64) instead of external
+-- file storage: works on Render (ephemeral filesystem) and fits the
+-- existing JSON Client. The frontend shrinks the image before uploading,
+-- so the text stays small; LONGTEXT gives ample margin.
 ALTER TABLE items ADD COLUMN image LONGTEXT NULL;

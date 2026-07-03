@@ -15,7 +15,7 @@ class ItemController {
   async getByUserId(req, res) {
     const userId = Number(req.params.userId);
     const allowed = await itemService.canViewInventory(req.user, userId);
-    if (!allowed) return res.status(403).json({ error: "Onvoldoende rechten" });
+    if (!allowed) return res.status(403).json({ error: "Insufficient permissions" });
 
     const items = await itemService.getItemByUserId(userId);
     if (!items) return res.status(404).json({ message: "Items not found" });
@@ -69,8 +69,8 @@ class ItemController {
 
   async update(req, res) {
     console.log("update", req.body);
-    // De notificatievlag wordt enkel via /items/:id/seen aangepast; zo kan een
-    // verouderde kopie aan de clientkant ze niet per ongeluk terugzetten.
+    // The notification flag is only changed via /items/:id/seen; this way a
+    // stale copy on the client side cannot accidentally reset it.
     const { is_new, ...data } = req.body;
     const item = await itemService.updateItem(Number(req.params.id), data);
     if (!item) return res.status(404).json({ message: "Item not found" });

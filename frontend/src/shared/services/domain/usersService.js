@@ -29,23 +29,23 @@ async function fetchUsers() {
   }
 }
 
-// Spelers uit de campagne(s) van de ingelogde DM (voor het DM-inventoryscherm).
+// Players from the campaign(s) of the logged-in DM (for the DM inventory screen).
 async function fetchCampaignPlayers() {
   state.errorMessage = "";
   try {
     state.campaignPlayers = await getCampaignPlayersUseCase.execute();
   } catch (err) {
-    state.errorMessage = err.message || "Kon spelers niet laden";
+    state.errorMessage = err.message || "Could not load players";
   }
 }
 
-// Volledige gebruikerslijst (ruwe objecten) voor het admin-scherm.
+// Full user list (raw objects) for the admin screen.
 async function fetchAdminUsers() {
   state.errorMessage = "";
   try {
     state.adminUsers = await adminGetAllUsersUseCase.execute();
   } catch (err) {
-    state.errorMessage = err.message || "Kon gebruikers niet laden";
+    state.errorMessage = err.message || "Could not load users";
   }
 }
 
@@ -56,12 +56,12 @@ async function deleteUser(userId) {
     await fetchAdminUsers();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon gebruiker niet verwijderen";
+    state.errorMessage = err.message || "Could not delete user";
     return false;
   }
 }
 
-// Werkt rol en/of campagne-koppeling bij.
+// Updates the role and/or campaign assignment.
 async function updateUser(userId, data) {
   state.errorMessage = "";
   try {
@@ -69,7 +69,7 @@ async function updateUser(userId, data) {
     await fetchAdminUsers();
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon gebruiker niet bijwerken";
+    state.errorMessage = err.message || "Could not update user";
     return false;
   }
 }

@@ -67,8 +67,8 @@ async function addItem(item, userId) {
   }
 }
 
-// Stuurt enkel de bewerkbare velden mee (niet id/created_at/userId of de hele
-// reactive kopie). De backend-update is dynamisch over de meegestuurde keys.
+// Sends only the editable fields (not id/created_at/userId or the whole
+// reactive copy). The backend update is dynamic over the sent keys.
 async function updateItem(item, userId) {
   state.errorMessage = "";
   try {
@@ -99,22 +99,22 @@ async function deleteItem(item, userId) {
   }
 }
 
-// DM: stuurt een kopie van `item` naar de opgegeven spelers. Het eigen item
-// blijft ongewijzigd, dus geen refetch nodig. Geeft true bij succes terug.
+// DM: sends a copy of `item` to the given players. The own item stays
+// unchanged, so no refetch is needed. Returns true on success.
 async function sendItem(item, recipientIds, quantity) {
   state.errorMessage = "";
   try {
     await sendItemUseCase.execute(item.id, recipientIds, quantity);
     return true;
   } catch (err) {
-    state.errorMessage = err.message || "Kon item niet versturen";
+    state.errorMessage = err.message || "Could not send item";
     return false;
   }
 }
 
-// De eigenaar hovert over een nieuw item: highlight meteen (optimistisch)
-// weghalen en de vlag op de backend uitzetten. Bij een fout zetten we ze
-// terug, zodat de server de waarheid blijft.
+// The owner hovers over a new item: remove the highlight immediately
+// (optimistically) and turn off the flag on the backend. On an error we set it
+// back, so the server remains the source of truth.
 async function markItemSeen(itemId) {
   const item = state.items.find((i) => i.id === itemId);
   if (!item || !item.is_new) return;
@@ -126,8 +126,8 @@ async function markItemSeen(itemId) {
   }
 }
 
-// Polling: haalt de inventory periodiek opnieuw op zodat items die intussen
-// door een admin of DM werden toegevoegd (met hun notificatie) verschijnen.
+// Polling: periodically refetches the inventory so that items added in the
+// meantime by an admin or DM (with their notification) appear.
 let pollTimer = null;
 
 function startPolling(userId, intervalMs = 15000) {
@@ -145,8 +145,8 @@ function stopPolling() {
 async function toggleFavourite(item) {
   item.favourite = !item.favourite;
   try {
-    // Enkel de gewijzigde vlag versturen: zo gaat de (mogelijk grote) base64-
-    // foto niet bij elke favoriet-toggle opnieuw over de lijn en naar de DB.
+    // Send only the changed flag: this way the (possibly large) base64
+    // photo does not go over the wire and into the DB on every favourite toggle.
     await updateItemUseCase.execute({ id: item.id, favourite: item.favourite });
     sortItems();
   } catch (err) {

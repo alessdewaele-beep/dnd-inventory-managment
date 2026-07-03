@@ -45,9 +45,9 @@ const ClientHelper = {
     }
 
     if (!res.ok) {
-      // Alleen wanneer er ook echt een token werd meegestuurd betekent 401
-      // "sessie verlopen/ongeldig". Zonder token (bv. mislukte login) laten
-      // we de aanroeper zelf de fout afhandelen.
+      // Only when a token was actually sent does a 401 mean
+      // "session expired/invalid". Without a token (e.g. a failed login) we
+      // let the caller handle the error itself.
       if (res.status === 401 && token) {
         localStorage.removeItem("JWT_token");
         window.location.hash = "#/";

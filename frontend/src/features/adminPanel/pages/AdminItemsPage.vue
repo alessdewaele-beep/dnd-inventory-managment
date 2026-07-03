@@ -13,7 +13,7 @@ const toast = useToast();
 
 const selectedUserId = ref(null);
 
-// Zelfde filteropzet als de inventory: globaal zoeken op naam.
+// Same filter setup as the inventory: global search by name.
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -31,33 +31,33 @@ function openDialog(item) {
 async function saveItem() {
   const item = selectedItem.value;
   if (!item.id && (!item.name || !item.description || !item.type || !item.quantity)) {
-    toast.add({ severity: "warn", summary: "Vul alle velden in", life: 3000 });
+    toast.add({ severity: "warn", summary: "Fill in all fields", life: 3000 });
     return;
   }
   const ok = item.id
     ? await itemsService.updateItem(item, selectedUserId.value)
     : await itemsService.addItem(item, selectedUserId.value);
   if (ok) {
-    toast.add({ severity: "success", summary: "Opgeslagen", life: 2500 });
+    toast.add({ severity: "success", summary: "Saved", life: 2500 });
     dialogVisible.value = false;
   } else {
-    toast.add({ severity: "error", summary: "Fout", detail: itemsService.state.errorMessage, life: 4000 });
+    toast.add({ severity: "error", summary: "Error", detail: itemsService.state.errorMessage, life: 4000 });
   }
 }
 
-// Argumentvolgorde volgt de emit van ItemsTable: (item, event).
+// Argument order follows the emit from ItemsTable: (item, event).
 function deleteItem(item, event) {
   confirm.require({
     target: event.currentTarget,
-    message: `Weet je zeker dat je "${item.name}" wilt verwijderen?`,
-    rejectProps: { label: "Annuleren", severity: "secondary", size: "small" },
-    acceptProps: { label: "Verwijderen", severity: "danger", size: "small" },
+    message: `Are you sure you want to delete "${item.name}"?`,
+    rejectProps: { label: "Cancel", severity: "secondary", size: "small" },
+    acceptProps: { label: "Delete", severity: "danger", size: "small" },
     accept: async () => {
       await itemsService.deleteItem(item, selectedUserId.value);
       if (itemsService.state.errorMessage) {
-        toast.add({ severity: "error", summary: "Fout", detail: itemsService.state.errorMessage, life: 4000 });
+        toast.add({ severity: "error", summary: "Error", detail: itemsService.state.errorMessage, life: 4000 });
       } else {
-        toast.add({ severity: "success", summary: "Verwijderd", life: 2500 });
+        toast.add({ severity: "success", summary: "Deleted", life: 2500 });
       }
     },
   });
@@ -66,7 +66,7 @@ function deleteItem(item, event) {
 const toggleFavourite = (item) => itemsService.toggleFavourite(item);
 const selectFilterWord = (word) => itemsService.selectFilterWord(word);
 
-// Laadt de items zodra een speler gekozen is; wist de (gedeelde) state anders.
+// Loads the items once a player is selected; otherwise clears the (shared) state.
 watch(selectedUserId, (id) => {
   itemsService.state.selectedFilter = "";
   if (id) {
@@ -82,17 +82,17 @@ onMounted(() => usersService.fetchAdminUsers());
 
 <template>
   <div>
-    <h2 class="font-serif text-2xl mb-1">Inventaris</h2>
-    <p class="text-sm opacity-70 mb-4">Bekijk en bewerk de items van een speler.</p>
+    <h2 class="font-serif text-2xl mb-1">Inventory</h2>
+    <p class="text-sm opacity-70 mb-4">View and edit a player's items.</p>
 
     <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
-      <label class="text-sm font-medium">Speler:</label>
+      <label class="text-sm font-medium">Player:</label>
       <p-select
         v-model="selectedUserId"
         :options="usersService.state.adminUsers"
         option-label="username"
         option-value="id"
-        placeholder="Kies een speler"
+        placeholder="Choose a player"
         filter
         class="w-full sm:w-64"
       />
@@ -114,7 +114,7 @@ onMounted(() => usersService.fetchAdminUsers());
       @delete-item="deleteItem"
     />
 
-    <div v-else class="opacity-60 text-sm">Kies eerst een speler om diens inventaris te tonen.</div>
+    <div v-else class="opacity-60 text-sm">Choose a player first to show their inventory.</div>
 
     <ItemFormDialog
       v-model:visible="dialogVisible"

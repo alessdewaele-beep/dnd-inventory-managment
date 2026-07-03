@@ -10,7 +10,7 @@ const { hasRight } = useRightManager();
 const { goIfAllowed, goLogin, goTo } = useNavigation();
 const { isDark, toggleTheme } = useTheme();
 
-// Laadt het profiel (voor de campagne-context) zodra iemand ingelogd is.
+// Loads the profile (for the campaign context) as soon as someone is logged in.
 onMounted(() => {
   if (authService.isLoggedIn()) {
     profileService.fetchMe();
@@ -28,7 +28,7 @@ const logOutAction = () => {
   <nav
     class="h-[64px] flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 border-b-2 border-gold bg-parchment/95 backdrop-blur shadow-sm dark:bg-ink dark:border-gold-deep"
   >
-    <!-- Logo & titel -->
+    <!-- Logo & title -->
     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
       <img
         src="../../../img/redDragon.png"
@@ -42,11 +42,11 @@ const logOutAction = () => {
       </h1>
     </div>
 
-    <!-- Campagne-context: enkel voor spelers/DM's met een gekoppelde campagne -->
+    <!-- Campaign context: only for players/DMs with an assigned campaign -->
     <div
       v-if="authService.isLoggedIn() && profileService.state.me?.campaign_name"
       class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold bg-gold/10 text-ink dark:text-ink-light shrink-0"
-      title="Huidige campagne"
+      title="Current campaign"
     >
       <i class="pi pi-map text-gold"></i>
       <span class="text-sm font-medium truncate max-w-[16rem]">
@@ -54,7 +54,7 @@ const logOutAction = () => {
       </span>
     </div>
 
-    <!-- Rechts: acties / user info / auth -->
+    <!-- Right: actions / user info / auth -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <p-button
         v-if="hasRight('Admin')"
@@ -77,7 +77,7 @@ const logOutAction = () => {
         v-if="authService.isLoggedIn()"
         type="button"
         @click="goTo('/profile')"
-        title="Naar mijn profiel"
+        title="Go to my profile"
         class="flex items-center gap-2 text-forest dark:text-forest-light font-medium text-sm hover:underline cursor-pointer"
       >
         <i class="pi pi-user"></i>

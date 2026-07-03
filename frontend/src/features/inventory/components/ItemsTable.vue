@@ -7,10 +7,10 @@ const props = defineProps({
   items: { type: Array, required: true },
   filters: { type: Object, required: true },
   selectedFilter: { type: String, required: true },
-  // Bekijkmodus (DM kijkt naar de inventory van een speler): geen toevoegen,
-  // bewerken, verwijderen of favoriet togglen.
+  // View mode (DM looks at a player's inventory): no adding, editing,
+  // deleting or toggling favourites.
   readonly: { type: Boolean, default: false },
-  // Toont de verstuur-actie (enkel de DM in zijn eigen inventory).
+  // Shows the send action (only the DM in their own inventory).
   canSend: { type: Boolean, default: false },
 });
 
@@ -24,14 +24,14 @@ const emit = defineEmits([
   "seen-item",
 ]);
 
-// Nieuwe (nog niet geziene) items krijgen een rijmarkering. Het item-id zit
-// in de klassenaam zodat de hover-handler weet welk item gezien werd; de
-// DataTable zelf biedt geen row-hover event met rowdata aan.
+// New (not yet seen) items get a row marker. The item id is embedded in the
+// class name so the hover handler knows which item was seen; the DataTable
+// itself does not provide a row-hover event with rowdata.
 const rowClass = (data) => (data.is_new ? `row-new row-new-id-${data.id}` : null);
 
-// Gedelegeerde hover-handler op de wrapper. De eigenaar moet 3 seconden
-// onafgebroken over een nieuw item hoveren voordat de notificatie verdwijnt;
-// verlaat de muis de rij eerder, dan breekt de timer af en blijft de vlag aan.
+// Delegated hover handler on the wrapper. The owner must hover over a new item
+// for 3 uninterrupted seconds before the notification disappears; if the mouse
+// leaves the row sooner, the timer aborts and the flag stays on.
 const HOVER_DELAY_MS = 3000;
 let hoverTimer = null;
 let hoverId = null;
@@ -47,7 +47,7 @@ function clearHover() {
 const onMouseOver = (event) => {
   if (props.readonly) return;
   const row = event.target.closest("tr.row-new");
-  // Geen nieuw item onder de muis: eventueel lopende timer afbreken.
+  // No new item under the mouse: abort any running timer.
   if (!row) {
     clearHover();
     return;
@@ -55,9 +55,9 @@ const onMouseOver = (event) => {
   const match = row.className.match(/row-new-id-(\d+)/);
   if (!match) return;
   const id = Number(match[1]);
-  // Zelfde rij: laat de lopende timer gewoon doortikken.
+  // Same row: just let the running timer keep ticking.
   if (id === hoverId) return;
-  // Nieuwe rij: herstart de teller van 3 seconden.
+  // New row: restart the 3-second counter.
   clearHover();
   hoverId = id;
   hoverTimer = setTimeout(() => {
@@ -66,7 +66,7 @@ const onMouseOver = (event) => {
   }, HOVER_DELAY_MS);
 };
 
-// Muis verlaat de tabel volledig: timer afbreken.
+// Mouse leaves the table entirely: abort timer.
 const onMouseLeave = () => clearHover();
 
 onUnmounted(clearHover);
@@ -91,7 +91,7 @@ onUnmounted(clearHover);
     >
       <template #empty>
         <p class="italic text-sm text-ink dark:text-ink-light py-6 text-center">
-          Geen items gevonden
+          No items found
         </p>
       </template>
       <template #header>
@@ -129,8 +129,8 @@ onUnmounted(clearHover);
             <span
               v-if="slotProps.data.is_new"
               class="new-badge"
-              title="Nieuw item — verdwijnt zodra je erover hovert"
-              >Nieuw</span
+              title="New item — disappears as soon as you hover over it"
+              >New</span
             >
           </div>
         </template>
@@ -188,13 +188,13 @@ onUnmounted(clearHover);
               v-if="props.canSend"
               class="pi pi-send cursor-pointer transition-transform hover:scale-125"
               style="font-size: 1.1rem; color: #d9b44a"
-              title="Verstuur naar spelers"
+              title="Send to players"
               @click="emit('send-item', slotProps.data)"
             ></i>
             <i
               class="pi pi-trash cursor-pointer transition-transform hover:scale-125"
               style="font-size: 1.1rem; color: #b22222"
-              title="Verwijderen"
+              title="Delete"
               @click="(event) => emit('delete-item', slotProps.data, event)"
             ></i>
           </div>
@@ -217,12 +217,12 @@ onUnmounted(clearHover);
   --dt-row-even: #f5f1e6;
   --dt-paginator-bg: #ede6d6;
 
-  /* Neutraliseer PrimeVue's eigen row-hover thema-token, zodat rijen
-     nergens van kleur veranderen bij hover. */
+  /* Neutralize PrimeVue's own row-hover theme token, so rows never change
+     color on hover. */
   --p-datatable-row-hover-background: transparent;
   --p-datatable-row-hover-color: inherit;
 
-  /* Idem voor sorteerbare kolomkoppen: geen (witte) hover-achtergrond. */
+  /* Likewise for sortable column headers: no (white) hover background. */
   --p-datatable-header-cell-hover-background: transparent;
   --p-datatable-header-cell-hover-color: var(--dt-header-fg);
   --p-datatable-header-cell-selected-background: transparent;
@@ -255,8 +255,8 @@ onUnmounted(clearHover);
   justify-content: center;
 }
 
-/* Sorteerbare koppen mogen bij hover/focus/actief niet lichter (wit) worden:
-   ze behouden dezelfde donkere header-achtergrond als de rest. */
+/* Sortable headers must not get lighter (white) on hover/focus/active:
+   they keep the same dark header background as the rest. */
 .my-datatable .p-datatable-thead > tr > th.p-datatable-sortable-column:hover,
 .my-datatable .p-datatable-thead > tr > th.p-datatable-sortable-column:focus,
 .my-datatable
@@ -267,7 +267,7 @@ onUnmounted(clearHover);
   color: var(--dt-header-fg);
 }
 
-/* Kolommen met tekstinhoud (Name, Type) lijnen links uit, net als hun cellen */
+/* Columns with text content (Name, Type) align left, just like their cells */
 .my-datatable .p-datatable-thead > tr > th.dt-col-left {
   text-align: left;
 }
@@ -303,7 +303,7 @@ onUnmounted(clearHover);
   color: var(--dt-fg);
 }
 
-/* Geen kleurverandering bij hover: rijen houden hun eigen achtergrond. */
+/* No color change on hover: rows keep their own background. */
 .my-datatable .p-datatable-tbody > tr:nth-child(odd):hover {
   background-color: var(--dt-row-odd);
 }
@@ -335,9 +335,9 @@ onUnmounted(clearHover);
   color: #f5f5f5;
 }
 
-/* Nieuw (nog niet gezien) item: gouden gloed over de hele rij. Staat NA de
-   odd/even- en hover-regels zodat deze tint wint zolang de vlag aan staat;
-   hovert de eigenaar, dan valt `is_new` weg en verdwijnen tint en badge. */
+/* New (not yet seen) item: golden glow over the whole row. Placed AFTER the
+   odd/even and hover rules so this tint wins as long as the flag is on; once
+   the owner hovers, `is_new` drops away and the tint and badge disappear. */
 .my-datatable .p-datatable-tbody > tr.row-new,
 .my-datatable .p-datatable-tbody > tr.row-new:hover {
   background-color: rgba(217, 180, 74, 0.22);

@@ -1,5 +1,5 @@
-// Haalt het eigen profiel op (id, username, role, campaign_id,
-// campaign_name, backstory) van de ingelogde gebruiker.
+// Fetches the user's own profile (id, username, role, campaign_id,
+// campaign_name, backstory) of the logged-in user.
 export default class GetMeUseCase {
   constructor(repository) {
     this.repository = repository;

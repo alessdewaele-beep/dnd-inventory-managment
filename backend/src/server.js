@@ -11,12 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-// Ruimere body-limiet dan de default 100kb: item-foto's worden als data-URI
-// (base64) meegestuurd in de JSON-body. De frontend verkleint ze eerst, dus
-// 2mb geeft ruime marge zonder de deur wagenwijd open te zetten.
+// Larger body limit than the default 100kb: item photos are sent as a data-URI
+// (base64) in the JSON body. The frontend shrinks them first, so 2mb gives
+// ample margin without leaving the door wide open.
 app.use(bodyParser.json({ limit: "2mb" }));
-app.use(express.json({ limit: "2mb" })); // zodat req.body werkt met JSON
-app.use(express.urlencoded({ extended: true, limit: "2mb" })); // voor form-data
+app.use(express.json({ limit: "2mb" })); // so req.body works with JSON
+app.use(express.urlencoded({ extended: true, limit: "2mb" })); // for form-data
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });

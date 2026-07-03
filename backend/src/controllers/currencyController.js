@@ -5,7 +5,7 @@ class CurrencyController {
     const userId = Number(req.params.userId);
     const allowed = await currencyService.canManage(req.user, userId);
     if (allowed !== true)
-      return res.status(403).json({ error: "Onvoldoende rechten" });
+      return res.status(403).json({ error: "Insufficient permissions" });
 
     const currency = await currencyService.getForUser(userId);
     res.json(currency);
@@ -15,7 +15,7 @@ class CurrencyController {
     const userId = Number(req.params.userId);
     const allowed = await currencyService.canManage(req.user, userId);
     if (allowed !== true)
-      return res.status(403).json({ error: "Onvoldoende rechten" });
+      return res.status(403).json({ error: "Insufficient permissions" });
 
     const result = await currencyService.setForUser(userId, req.body);
     if (result.error) {

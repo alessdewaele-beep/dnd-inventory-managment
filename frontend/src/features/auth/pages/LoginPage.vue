@@ -13,7 +13,7 @@ const { goHome, goTo } = useNavigation();
 const logInUser = async () => {
   const success = await authService.login(username.value, password.value);
   if (success) {
-    // Admins gaan meteen naar het adminpaneel; anderen naar hun inventory.
+    // Admins go straight to the admin panel; others to their inventory.
     if (authService.getRole() === Roles.ADMIN) {
       goTo("/admin");
     } else {

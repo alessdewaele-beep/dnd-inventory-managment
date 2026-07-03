@@ -1,11 +1,11 @@
 <script setup>
-// Zijmenu voor het admin-scherm. Elke link verwijst naar een sub-route van
-// /admin; router-link-active regelt de actieve markering.
+// Sidebar for the admin screen. Each link points to a sub-route of
+// /admin; router-link-active handles the active highlight.
 const links = [
   { to: "/admin", label: "Dashboard", icon: "pi pi-chart-bar", exact: true },
-  { to: "/admin/users", label: "Gebruikers", icon: "pi pi-users" },
-  { to: "/admin/campaigns", label: "Campagnes", icon: "pi pi-flag" },
-  { to: "/admin/items", label: "Inventaris", icon: "pi pi-box" },
+  { to: "/admin/users", label: "Users", icon: "pi pi-users" },
+  { to: "/admin/campaigns", label: "Campaigns", icon: "pi pi-flag" },
+  { to: "/admin/items", label: "Inventory", icon: "pi pi-box" },
 ];
 </script>
 

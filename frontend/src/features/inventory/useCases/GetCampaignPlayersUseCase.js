@@ -3,7 +3,7 @@ export default class GetCampaignPlayersUseCase {
     this.repository = repository;
   }
 
-  // Geeft de spelers van de campagne(s) die de ingelogde DM leidt.
+  // Returns the players of the campaign(s) the logged-in DM leads.
   async execute() {
     return this.repository.getMyCampaignPlayers();
   }

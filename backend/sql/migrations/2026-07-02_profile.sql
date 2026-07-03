@@ -1,9 +1,9 @@
--- Profielpagina: eigen backstory voor spelers + unieke usernames afdwingen.
--- Draai dit één keer op de (Aiven) database.
+-- Profile page: own backstory for players + enforce unique usernames.
+-- Run this once on the (Aiven) database.
 
--- Backstory-kolom (nullable; enkel spelers vullen dit in via hun profiel).
+-- Backstory column (nullable; only players fill this in via their profile).
 ALTER TABLE users ADD COLUMN backstory TEXT NULL;
 
--- Username uniek afdwingen. Draai dit enkel als er nog geen unieke index bestaat;
--- MySQL geeft een fout als de constraint al aanwezig is (dan mag je deze regel overslaan).
+-- Enforce unique usernames. Only run this if no unique index exists yet;
+-- MySQL throws an error if the constraint is already present (in which case you may skip this line).
 ALTER TABLE users ADD UNIQUE KEY uq_users_username (username);

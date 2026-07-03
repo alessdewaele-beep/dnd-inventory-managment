@@ -4,7 +4,7 @@ import { ref, computed } from "vue";
 const props = defineProps({
   filters: { type: Object, required: true },
   selectedFilter: { type: String, required: true },
-  // Bekijkmodus: verberg de "Add"-knop (DM bekijkt een speler-inventory).
+  // View mode: hide the "Add" button (DM views a player inventory).
   readonly: { type: Boolean, default: false },
 });
 
@@ -18,26 +18,26 @@ const filterButtons = [
   { label: "Jewelry", icon: "pi pi-star", value: "jewelry", bgColor: "#d4af37", color: "#1b1b1b" },
 ];
 
-// Inklapstatus van de categoriefilters op mobiel. Vanaf sm zijn ze altijd zichtbaar.
+// Collapse state of the category filters on mobile. From sm they are always visible.
 const filtersOpen = ref(false);
 
-// Toont de gekozen categorie op de toggle-knop, zodat je bij ingeklapte filters
-// nog steeds ziet welke actief is.
+// Shows the selected category on the toggle button, so that with collapsed
+// filters you can still see which one is active.
 const activeLabel = computed(
   () => filterButtons.find((b) => b.value === props.selectedFilter)?.label ?? "Filters"
 );
 
 function pick(value) {
   emit("select-filter", value);
-  filtersOpen.value = false; // sluit de lijst na een keuze op mobiel
+  filtersOpen.value = false; // close the list after a choice on mobile
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-3 px-4 py-3 bg-ink text-gold dark:bg-black/40">
-    <!-- Bovenste rij: zoeken + acties (altijd zichtbaar) -->
+    <!-- Top row: search + actions (always visible) -->
     <div class="flex flex-wrap items-center gap-2">
-      <!-- Zoekveld -->
+      <!-- Search field -->
       <div class="flex flex-1 min-w-[10rem] items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5">
         <i class="pi pi-search text-blood shrink-0"></i>
         <p-inputText
@@ -47,7 +47,7 @@ function pick(value) {
         />
       </div>
 
-      <!-- Filters-toggle: enkel op mobiel -->
+      <!-- Filters toggle: only on mobile -->
       <button
         type="button"
         @click="filtersOpen = !filtersOpen"
@@ -58,7 +58,7 @@ function pick(value) {
         <i :class="filtersOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="text-xs"></i>
       </button>
 
-      <!-- Add knop -->
+      <!-- Add button -->
       <button
         v-if="!props.readonly"
         type="button"
@@ -70,7 +70,7 @@ function pick(value) {
       </button>
     </div>
 
-    <!-- Categorie-filters: inklapbaar op mobiel, altijd zichtbaar vanaf sm -->
+    <!-- Category filters: collapsible on mobile, always visible from sm -->
     <div
       :class="[
         filtersOpen ? 'flex' : 'hidden',

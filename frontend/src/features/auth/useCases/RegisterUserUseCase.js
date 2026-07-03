@@ -7,17 +7,17 @@ export default class RegisterUserUseCase {
 
   async execute(user) {
     if (!user.username || !user.password) {
-      throw new Error("Vul alle velden in!");
+      throw new Error("Please fill in all fields!");
     }
     if (user.password.length < 8) {
-      throw new Error("Wachtwoord moet minstens 8 tekens zijn");
+      throw new Error("Password must be at least 8 characters");
     }
 
     try {
       return await this.repository.registerUser(user);
     } catch (err) {
       if (err instanceof HTTPError) {
-        throw new Error(err.body?.error || "Registreren mislukt");
+        throw new Error(err.body?.error || "Registration failed");
       }
       throw err;
     }

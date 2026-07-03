@@ -11,14 +11,14 @@ const state = reactive({
   errorMessage: "",
 });
 
-// Haalt alle dashboard-cijfers (totalen + recente activiteit) in één call op.
+// Fetches all dashboard figures (totals + recent activity) in a single call.
 async function fetchStats() {
   state.errorMessage = "";
   state.loading = true;
   try {
     state.stats = await getAdminStatsUseCase.execute();
   } catch (err) {
-    state.errorMessage = err.message || "Kon statistieken niet laden";
+    state.errorMessage = err.message || "Could not load statistics";
   } finally {
     state.loading = false;
   }

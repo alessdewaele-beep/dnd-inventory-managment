@@ -29,23 +29,23 @@ const userMap = computed(() => {
 
 const userOptions = computed(() => usersService.state.adminUsers);
 
-// Spelers van de campagne in de spelersdialog.
+// Players of the campaign in the players dialog.
 const currentPlayers = computed(() => {
   const c = playersDialog.value.campaign;
   if (!c) return [];
   return usersService.state.adminUsers.filter((u) => u.campaign_id === c.id);
 });
 
-// Gebruikers die nog aan geen enkele campagne gekoppeld zijn (toevoegbaar).
+// Users not yet assigned to any campaign (addable).
 const assignableUsers = computed(() =>
   usersService.state.adminUsers.filter((u) => !u.campaign_id)
 );
 
 function notify(ok, okDetail, service) {
   if (ok) {
-    toast.add({ severity: "success", summary: "Gelukt", detail: okDetail, life: 3000 });
+    toast.add({ severity: "success", summary: "Success", detail: okDetail, life: 3000 });
   } else {
-    toast.add({ severity: "error", summary: "Fout", detail: service.state.errorMessage, life: 4000 });
+    toast.add({ severity: "error", summary: "Error", detail: service.state.errorMessage, life: 4000 });
   }
 }
 
@@ -63,32 +63,32 @@ function openEdit(campaign) {
 async function saveCampaign() {
   const c = selectedCampaign.value;
   if (!c.name) {
-    toast.add({ severity: "warn", summary: "Naam verplicht", life: 3000 });
+    toast.add({ severity: "warn", summary: "Name required", life: 3000 });
     return;
   }
   const ok = c.id
     ? await campaignsService.updateCampaign(c.id, { name: c.name, description: c.description })
     : await campaignsService.createCampaign({ name: c.name, description: c.description });
-  notify(ok, c.id ? "Campagne bijgewerkt." : "Campagne aangemaakt.", campaignsService);
+  notify(ok, c.id ? "Campaign updated." : "Campaign created.", campaignsService);
   if (ok) formVisible.value = false;
 }
 
 function confirmDelete(event, campaign) {
   confirm.require({
     target: event.currentTarget,
-    header: "Campagne verwijderen",
-    message: `Weet je zeker dat je "${campaign.name}" wilt verwijderen?`,
+    header: "Delete campaign",
+    message: `Are you sure you want to delete "${campaign.name}"?`,
     icon: "pi pi-exclamation-triangle",
-    rejectProps: { label: "Annuleren", severity: "secondary" },
-    acceptProps: { label: "Verwijderen", severity: "danger" },
+    rejectProps: { label: "Cancel", severity: "secondary" },
+    acceptProps: { label: "Delete", severity: "danger" },
     accept: async () => {
       const ok = await campaignsService.deleteCampaign(campaign.id);
-      notify(ok, "Campagne verwijderd.", campaignsService);
+      notify(ok, "Campaign deleted.", campaignsService);
     },
   });
 }
 
-// --- DM toewijzen ---
+// --- Assign DM ---
 function openDm(campaign) {
   dmDialog.value = { visible: true, campaign, userId: campaign.dungeon_master ?? null };
 }
@@ -97,11 +97,11 @@ async function saveDm() {
   const { campaign, userId } = dmDialog.value;
   const ok = await campaignsService.assignDungeonMaster(campaign.id, userId);
   if (ok) await usersService.fetchAdminUsers();
-  notify(ok, "Dungeon master bijgewerkt.", campaignsService);
+  notify(ok, "Dungeon master updated.", campaignsService);
   if (ok) dmDialog.value.visible = false;
 }
 
-// --- Spelers beheren ---
+// --- Manage players ---
 function openPlayers(campaign) {
   playersDialog.value = { visible: true, campaign, addUserId: null };
 }
@@ -110,13 +110,13 @@ async function addPlayer() {
   const { campaign, addUserId } = playersDialog.value;
   if (!addUserId) return;
   const ok = await usersService.updateUser(addUserId, { campaign_id: campaign.id });
-  notify(ok, "Speler toegevoegd.", usersService);
+  notify(ok, "Player added.", usersService);
   if (ok) playersDialog.value.addUserId = null;
 }
 
 async function removePlayer(user) {
   const ok = await usersService.updateUser(user.id, { campaign_id: null });
-  notify(ok, "Speler verwijderd uit campagne.", usersService);
+  notify(ok, "Player removed from campaign.", usersService);
 }
 
 function playerCount(campaign) {
@@ -133,10 +133,10 @@ onMounted(() => {
   <div>
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h2 class="font-serif text-2xl mb-1">Campagnes</h2>
-        <p class="text-sm opacity-70">Beheer campagnes, DM's en spelers.</p>
+        <h2 class="font-serif text-2xl mb-1">Campaigns</h2>
+        <p class="text-sm opacity-70">Manage campaigns, DMs and players.</p>
       </div>
-      <p-button label="Nieuwe campagne" icon="pi pi-plus" @click="openCreate" />
+      <p-button label="New campaign" icon="pi pi-plus" @click="openCreate" />
     </div>
 
     <p v-if="campaignsService.state.errorMessage" class="text-blood mb-4">
@@ -162,7 +162,7 @@ onMounted(() => {
             <i class="pi pi-search text-blood shrink-0"></i>
             <p-inputText
               v-model="filters.global.value"
-              placeholder="Zoeken…"
+              placeholder="Search…"
               class="!bg-transparent !border-none !text-ink-light !outline-none w-full"
             />
           </div>
@@ -170,12 +170,12 @@ onMounted(() => {
       </template>
 
       <template #empty>
-        <div class="py-6 text-center opacity-60">Geen campagnes gevonden.</div>
+        <div class="py-6 text-center opacity-60">No campaigns found.</div>
       </template>
 
       <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem" />
-      <p-column field="name" header="Naam" sortable headerClass="dt-col-left" style="min-width: 9rem" />
-      <p-column field="description" header="Beschrijving" headerClass="dt-col-left" style="min-width: 12rem">
+      <p-column field="name" header="Name" sortable headerClass="dt-col-left" style="min-width: 9rem" />
+      <p-column field="description" header="Description" headerClass="dt-col-left" style="min-width: 12rem">
         <template #body="{ data }">
           <span class="opacity-80 line-clamp-2">{{ data.description || "—" }}</span>
         </template>
@@ -185,21 +185,21 @@ onMounted(() => {
           <span v-if="data.dungeon_master" class="flex items-center gap-2">
             <i class="pi pi-user opacity-60"></i>{{ userMap[data.dungeon_master] || `#${data.dungeon_master}` }}
           </span>
-          <span v-else class="opacity-50">Geen</span>
+          <span v-else class="opacity-50">None</span>
         </template>
       </p-column>
-      <p-column header="Spelers" style="width: 6rem; min-width: 6rem">
+      <p-column header="Players" style="width: 6rem; min-width: 6rem">
         <template #body="{ data }">
           <p-tag :value="String(playerCount(data))" severity="secondary" />
         </template>
       </p-column>
-      <p-column header="Acties" style="width: 13rem; min-width: 13rem">
+      <p-column header="Actions" style="width: 13rem; min-width: 13rem">
         <template #body="{ data }">
           <div class="flex gap-2">
-            <p-button icon="pi pi-pencil" size="small" severity="secondary" title="Bewerken" @click="openEdit(data)" />
-            <p-button icon="pi pi-crown" size="small" severity="secondary" title="DM toewijzen" @click="openDm(data)" />
-            <p-button icon="pi pi-users" size="small" severity="secondary" title="Spelers" @click="openPlayers(data)" />
-            <p-button icon="pi pi-trash" size="small" severity="danger" title="Verwijderen" @click="confirmDelete($event, data)" />
+            <p-button icon="pi pi-pencil" size="small" severity="secondary" title="Edit" @click="openEdit(data)" />
+            <p-button icon="pi pi-crown" size="small" severity="secondary" title="Assign DM" @click="openDm(data)" />
+            <p-button icon="pi pi-users" size="small" severity="secondary" title="Players" @click="openPlayers(data)" />
+            <p-button icon="pi pi-trash" size="small" severity="danger" title="Delete" @click="confirmDelete($event, data)" />
           </div>
         </template>
       </p-column>
@@ -213,43 +213,43 @@ onMounted(() => {
       @cancel="formVisible = false"
     />
 
-    <!-- DM toewijzen -->
+    <!-- Assign DM -->
     <p-dialog
       v-model:visible="dmDialog.visible"
       modal
       class="my-dialog w-full max-w-[460px] mx-4"
-      header="Dungeon master toewijzen"
+      header="Assign dungeon master"
     >
       <div v-if="dmDialog.campaign" class="flex flex-col gap-4 pt-2">
         <p class="text-sm opacity-80">
-          Kies de DM voor <strong>{{ dmDialog.campaign.name }}</strong>. De gekozen gebruiker krijgt automatisch de rol DM.
+          Choose the DM for <strong>{{ dmDialog.campaign.name }}</strong>. The chosen user will automatically receive the DM role.
         </p>
         <p-select
           v-model="dmDialog.userId"
           :options="userOptions"
           option-label="username"
           option-value="id"
-          placeholder="Kies een gebruiker"
+          placeholder="Choose a user"
           show-clear
           class="w-full"
         />
         <div class="flex justify-end gap-2">
-          <p-button label="Annuleren" severity="secondary" @click="dmDialog.visible = false" />
-          <p-button label="Opslaan" icon="pi pi-check" class="dt-primary-btn" @click="saveDm" />
+          <p-button label="Cancel" severity="secondary" @click="dmDialog.visible = false" />
+          <p-button label="Save" icon="pi pi-check" class="dt-primary-btn" @click="saveDm" />
         </div>
       </div>
     </p-dialog>
 
-    <!-- Spelers beheren -->
+    <!-- Manage players -->
     <p-dialog
       v-model:visible="playersDialog.visible"
       modal
       class="my-dialog w-full max-w-[520px] mx-4"
-      header="Spelers beheren"
+      header="Manage players"
     >
       <div v-if="playersDialog.campaign" class="flex flex-col gap-4 pt-2">
         <p class="text-sm opacity-80">
-          Spelers gekoppeld aan <strong>{{ playersDialog.campaign.name }}</strong>.
+          Players assigned to <strong>{{ playersDialog.campaign.name }}</strong>.
         </p>
 
         <ul class="divide-y divide-gold/20 max-h-56 overflow-auto">
@@ -262,28 +262,28 @@ onMounted(() => {
               <i class="pi pi-user opacity-60"></i>{{ p.username }}
               <p-tag :value="p.role" severity="secondary" />
             </span>
-            <p-button icon="pi pi-times" size="small" severity="danger" text title="Loskoppelen" @click="removePlayer(p)" />
+            <p-button icon="pi pi-times" size="small" severity="danger" text title="Remove" @click="removePlayer(p)" />
           </li>
-          <li v-if="!currentPlayers.length" class="py-2 text-sm opacity-60">Nog geen spelers.</li>
+          <li v-if="!currentPlayers.length" class="py-2 text-sm opacity-60">No players yet.</li>
         </ul>
 
         <div class="flex items-end gap-2 border-t border-gold/20 pt-3">
           <div class="flex-1 flex flex-col gap-1">
-            <label class="text-sm font-medium">Speler toevoegen</label>
+            <label class="text-sm font-medium">Add player</label>
             <p-select
               v-model="playersDialog.addUserId"
               :options="assignableUsers"
               option-label="username"
               option-value="id"
-              placeholder="Kies een vrije gebruiker"
+              placeholder="Choose an available user"
               class="w-full"
             />
           </div>
-          <p-button icon="pi pi-plus" label="Toevoegen" :disabled="!playersDialog.addUserId" @click="addPlayer" />
+          <p-button icon="pi pi-plus" label="Add" :disabled="!playersDialog.addUserId" @click="addPlayer" />
         </div>
 
         <div class="flex justify-end">
-          <p-button label="Sluiten" severity="secondary" @click="playersDialog.visible = false" />
+          <p-button label="Close" severity="secondary" @click="playersDialog.visible = false" />
         </div>
       </div>
     </p-dialog>

@@ -10,7 +10,7 @@ const { goLogin, goHome } = useNavigation();
 const { hasRight } = useRightManager();
 
 onMounted(() => {
-  // Extra vangnet naast de router-guard: enkel ingelogde admins hier.
+  // Extra safety net alongside the router guard: only logged-in admins here.
   if (!authService.isLoggedIn()) {
     authService.logout();
     goLogin();

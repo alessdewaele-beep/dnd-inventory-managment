@@ -3,7 +3,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
   throw new Error(
-    "JWT_SECRET ontbreekt. Voeg JWT_SECRET=<een lange willekeurige string> toe aan je .env"
+    "JWT_SECRET is missing. Add JWT_SECRET=<a long random string> to your .env"
   );
 }
 

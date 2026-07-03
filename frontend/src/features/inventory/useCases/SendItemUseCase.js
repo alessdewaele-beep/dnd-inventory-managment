@@ -3,8 +3,8 @@ export default class SendItemUseCase {
     this.repository = repository;
   }
 
-  // itemId: het te kopiëren bronitem van de DM.
-  // recipientIds: array van speler-id's. quantity: aantal per ontvanger.
+  // itemId: the DM's source item to copy.
+  // recipientIds: array of player ids. quantity: amount per recipient.
   async execute(itemId, recipientIds, quantity) {
     return this.repository.sendItem(itemId, { recipientIds, quantity });
   }

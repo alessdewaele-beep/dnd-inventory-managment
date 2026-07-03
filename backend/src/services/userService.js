@@ -8,14 +8,14 @@ const User = require("../models/User");
 class UserService {
   async register(user) {
     if (!user.username || !user.password || !user.campaignId) {
-      throw new Error("Alle velden zijn verplicht");
+      throw new Error("All fields are required");
     }
     try {
       console.log(user);
       return await userRepository.createUser(user);
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
-        throw new Error("Username bestaat al");
+        throw new Error("Username already exists");
       }
       throw err;
     }
@@ -36,8 +36,8 @@ class UserService {
     return { token, id: user.id, username: user.username, role: user.role };
   }
 
-  // Bouwt het publieke profielobject (zonder password_hash) en resolvet
-  // de campagnenaam op basis van campaign_id.
+  // Builds the public profile object (without password_hash) and resolves
+  // the campaign name based on campaign_id.
   async #toProfile(userRow) {
     let campaignName = null;
     if (userRow.campaign_id) {
@@ -54,20 +54,20 @@ class UserService {
     };
   }
 
-  // Eigen profiel van de ingelogde gebruiker.
+  // Own profile of the logged-in user.
   async getMe(userId) {
     const user = await userRepository.findById(userId);
     if (!user) return null;
     return this.#toProfile(user);
   }
 
-  // Self-service update: enkel de eigen username en (voor spelers) backstory.
-  // Geeft bij een username-wijziging een nieuwe JWT terug zodat de token
-  // in sync blijft met de nieuwe username.
+  // Self-service update: only the own username and (for players) backstory.
+  // On a username change, returns a new JWT so the token stays in sync with
+  // the new username.
   async updateSelf(requester, data) {
     const current = await userRepository.findById(requester.id);
     if (!current) {
-      const err = new Error("Gebruiker niet gevonden");
+      const err = new Error("User not found");
       err.status = 404;
       throw err;
     }
@@ -78,7 +78,7 @@ class UserService {
     if (data.username !== undefined) {
       const username = String(data.username).trim();
       if (!username) {
-        const err = new Error("Username mag niet leeg zijn");
+        const err = new Error("Username may not be empty");
         err.status = 400;
         throw err;
       }
@@ -88,10 +88,10 @@ class UserService {
       }
     }
 
-    // Backstory is enkel voor spelers.
+    // Backstory is only for players.
     if (data.backstory !== undefined) {
       if (current.role !== "Player") {
-        const err = new Error("Alleen spelers hebben een backstory");
+        const err = new Error("Only players have a backstory");
         err.status = 403;
         throw err;
       }
@@ -104,7 +104,7 @@ class UserService {
         updated = await userRepository.update(requester.id, updates);
       } catch (err) {
         if (err.code === "ER_DUP_ENTRY") {
-          const dup = new Error("Deze username is al in gebruik");
+          const dup = new Error("This username is already in use");
           dup.status = 409;
           throw dup;
         }
@@ -114,7 +114,7 @@ class UserService {
 
     const profile = await this.#toProfile(updated);
 
-    // Nieuwe token enkel wanneer de username effectief wijzigde.
+    // New token only when the username actually changed.
     let token;
     if (usernameChanged) {
       token = jwt.sign(
@@ -127,29 +127,29 @@ class UserService {
     return { user: profile, token };
   }
 
-  // Wachtwoord wijzigen met verificatie van het huidige wachtwoord.
+  // Change password with verification of the current password.
   async changePassword(userId, currentPassword, newPassword) {
     if (!currentPassword || !newPassword) {
-      const err = new Error("Huidig en nieuw wachtwoord zijn verplicht");
+      const err = new Error("Current and new password are required");
       err.status = 400;
       throw err;
     }
     if (String(newPassword).length < 6) {
-      const err = new Error("Nieuw wachtwoord moet minstens 6 tekens zijn");
+      const err = new Error("New password must be at least 6 characters");
       err.status = 400;
       throw err;
     }
 
     const user = await userRepository.findById(userId);
     if (!user) {
-      const err = new Error("Gebruiker niet gevonden");
+      const err = new Error("User not found");
       err.status = 404;
       throw err;
     }
 
     const match = await bcrypt.compare(currentPassword, user.password_hash);
     if (!match) {
-      const err = new Error("Huidig wachtwoord is onjuist");
+      const err = new Error("Current password is incorrect");
       err.status = 400;
       throw err;
     }
@@ -158,8 +158,8 @@ class UserService {
     return true;
   }
 
-  // Volledige lijst voor het admin-scherm: id, username, role, campaign_id,
-  // created_at. Nooit password_hash (repository selecteert die niet).
+  // Full list for the admin screen: id, username, role, campaign_id,
+  // created_at. Never password_hash (the repository does not select it).
   async getAll() {
     return userRepository.getAll();
   }
@@ -168,7 +168,7 @@ class UserService {
     return userRepository.deleteById(id);
   }
 
-  // Beheert rol en campagne-koppeling van een gebruiker (admin).
+  // Manages a user's role and campaign assignment (admin).
   async updateUser(id, data) {
     const allowed = {};
     if (data.role !== undefined) allowed.role = data.role;
@@ -183,8 +183,8 @@ class UserService {
     };
   }
 
-  // Mag `requester` de spelers van deze campaign opvragen?
-  // Toegestaan voor de Admin en de DM van die campaign.
+  // May `requester` request the players of this campaign?
+  // Allowed for the Admin and the DM of that campaign.
   async canViewCampaignPlayers(requester, campaignId) {
     if (requester.role === "Admin") return true;
     const campaign = await campaignRepository.getById(campaignId);
@@ -196,8 +196,8 @@ class UserService {
     return rows.map((user) => new User(user.username, user.id, user.role));
   }
 
-  // Alle spelers uit de campagne(s) die `dm` leidt, exclusief de DM zelf.
-  // Gebruikt door het DM-scherm om inventories te bekijken en items te sturen.
+  // All players from the campaign(s) that `dm` leads, excluding the DM themselves.
+  // Used by the DM screen to view inventories and send items.
   async getMyCampaignPlayers(dm) {
     const campaigns = await campaignRepository.getByDungeonMaster(dm.id);
     const seen = new Map();
