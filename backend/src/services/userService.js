@@ -8,25 +8,26 @@ const User = require("../models/User");
 class UserService {
   async register(user) {
     if (!user.username || !user.password || !user.campaignId) {
-      throw new Error("All fields are required");
+      throw new Error("Please fill in a username, password and campaign.");
     }
     try {
-      console.log(user);
       return await userRepository.createUser(user);
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
-        throw new Error("Username already exists");
+        throw new Error("That username is already taken. Please choose another.");
       }
       throw err;
     }
   }
 
   async login(username, password) {
+    // Deliberately the same message whether the username is unknown or the
+    // password is wrong, so we don't reveal which usernames exist.
     const user = await userRepository.findByUsername(username);
-    if (!user) throw new Error("Invalid credentials");
+    if (!user) throw new Error("Incorrect username or password.");
 
     const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) throw new Error("Invalid credentials");
+    if (!match) throw new Error("Incorrect username or password.");
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },

@@ -37,11 +37,20 @@ const ClientHelper = {
       throw new NetworkError(url, cause);
     }
 
-    let data;
-    try {
-      data = await res.json();
-    } catch (cause) {
-      throw new ParseError(url, cause);
+    // Read the body as text first, then try to parse it as JSON. This way an
+    // empty or non-JSON body (e.g. a bare 500 or a proxy error page) does not
+    // crash with a ParseError that hides the real HTTP status.
+    const rawBody = await res.text();
+    let data = null;
+    if (rawBody) {
+      try {
+        data = JSON.parse(rawBody);
+      } catch (cause) {
+        // A successful response is expected to be JSON; if it isn't, that is a
+        // genuine parse problem. On an error response we keep data = null and
+        // let HTTPError produce a friendly status-based message instead.
+        if (res.ok) throw new ParseError(url, cause);
+      }
     }
 
     if (!res.ok) {
