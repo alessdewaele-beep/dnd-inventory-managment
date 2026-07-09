@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { authService } from "@/shared/services/domain/authService";
 import { profileService } from "@/shared/services/domain/profileService";
+import { notificationsService } from "@/shared/services/domain/notificationsService";
 import { useRightManager } from "@/shared/composables/useRightManager";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import { useTheme } from "@/shared/composables/useTheme";
@@ -10,15 +11,24 @@ const { hasRight } = useRightManager();
 const { goIfAllowed, goLogin, goTo } = useNavigation();
 const { isDark, toggleTheme } = useTheme();
 
-// Loads the profile (for the campaign context) as soon as someone is logged in.
+// Unread notification badge; capped at "9+" for layout.
+const unreadBadge = computed(() => {
+  const n = notificationsService.state.unreadCount;
+  return n > 9 ? "9+" : String(n);
+});
+
+// Loads the profile (for the campaign context) and starts the notification
+// badge polling as soon as someone is logged in.
 onMounted(() => {
   if (authService.isLoggedIn()) {
     profileService.fetchMe();
+    notificationsService.startPolling();
   }
 });
 
 const logOutAction = () => {
   profileService.clear();
+  notificationsService.clear();
   authService.logout();
   goLogin();
 };
@@ -63,6 +73,23 @@ const logOutAction = () => {
         size="small"
         @click="goIfAllowed('/admin', 'Admin')"
       />
+
+      <button
+        v-if="authService.isLoggedIn()"
+        type="button"
+        @click="goTo('/notifications')"
+        title="Notifications"
+        aria-label="Notifications"
+        class="relative h-9 w-9 flex items-center justify-center rounded-full border border-gold text-ink hover:bg-gold/20 transition-colors cursor-pointer dark:text-gold dark:hover:bg-white/10"
+      >
+        <i class="pi pi-bell"></i>
+        <span
+          v-if="notificationsService.state.unreadCount > 0"
+          class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-blood text-white text-[0.65rem] font-bold leading-none"
+        >
+          {{ unreadBadge }}
+        </span>
+      </button>
 
       <button
         type="button"

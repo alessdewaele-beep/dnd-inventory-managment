@@ -18,6 +18,15 @@ class ItemRepository {
     return rows;
   }
 
+  // Shared inventory: items that belong to a whole campaign (userId is NULL).
+  async getByCampaignId(campaignId) {
+    const [rows] = await pool.query(
+      "SELECT * FROM items WHERE campaign_id = ?",
+      [campaignId]
+    );
+    return rows;
+  }
+
   async create(item) {
     const {
       name,
@@ -25,15 +34,16 @@ class ItemRepository {
       type,
       quantity,
       favourite,
-      userId,
+      userId = null,
+      campaign_id = null,
       is_new = false,
       image = null,
     } = item;
     const [result] = await pool.query(
-      "INSERT INTO items (name, description, type, quantity, favourite, userId, is_new, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [name, description, type, quantity, favourite, userId, is_new, image]
+      "INSERT INTO items (name, description, type, quantity, favourite, userId, campaign_id, is_new, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [name, description, type, quantity, favourite, userId, campaign_id, is_new, image]
     );
-    return { id: result.insertId, ...item, is_new, image };
+    return { id: result.insertId, ...item, userId, campaign_id, is_new, image };
   }
 
   // Owner has seen the new item: turn off the notification flag.

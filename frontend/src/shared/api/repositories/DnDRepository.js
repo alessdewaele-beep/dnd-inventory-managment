@@ -19,6 +19,14 @@ export default class DnDRepository {
     throw new Error("method not implemented", itemId);
   }
 
+  getSharedInventory() {
+    throw new Error("method not implemented");
+  }
+
+  moveItem(itemId, to) {
+    throw new Error("method not implemented", itemId);
+  }
+
   markItemSeen(itemId) {
     throw new Error("method not implemented", itemId);
   }
@@ -97,5 +105,34 @@ export default class DnDRepository {
 
   updateCurrency(userId, coins) {
     throw new Error("method not implemented", userId);
+  }
+
+  getSharedCurrency() {
+    throw new Error("method not implemented");
+  }
+
+  updateSharedCurrency(coins) {
+    throw new Error("method not implemented", coins);
+  }
+
+  transferCurrency(direction, coins) {
+    throw new Error("method not implemented", direction);
+  }
+
+  // --- Notifications ---
+  getNotifications() {
+    throw new Error("method not implemented");
+  }
+
+  getUnreadNotificationCount() {
+    throw new Error("method not implemented");
+  }
+
+  markNotificationRead(id) {
+    throw new Error("method not implemented", id);
+  }
+
+  markAllNotificationsRead() {
+    throw new Error("method not implemented");
   }
 }

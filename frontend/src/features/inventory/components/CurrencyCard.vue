@@ -4,9 +4,11 @@ import { reactive, ref, computed, watch } from "vue";
 const props = defineProps({
   // The stored purse: { pp, gp, sp, cp }.
   currency: { type: Object, required: true },
+  // Shows a "Transfer coins" action inside the expanded card (party purse).
+  canTransfer: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(["save"]);
+const emit = defineEmits(["save", "transfer"]);
 
 // The four coin types with their label and color. Decimal rate:
 // 1 pp = 10 gp, 1 gp = 10 sp, 1 sp = 10 cp.
@@ -104,7 +106,15 @@ const save = () =>
         </div>
       </div>
 
-      <div class="flex justify-end mt-3">
+      <div class="flex justify-end mt-3 gap-2">
+        <p-button
+          v-if="props.canTransfer"
+          label="Transfer coins"
+          icon="pi pi-arrow-right-arrow-left"
+          size="small"
+          outlined
+          @click="emit('transfer')"
+        />
         <p-button
           label="Save"
           icon="pi pi-check"

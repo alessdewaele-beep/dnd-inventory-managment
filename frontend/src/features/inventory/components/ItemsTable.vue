@@ -12,6 +12,10 @@ const props = defineProps({
   readonly: { type: Boolean, default: false },
   // Shows the send action (only the DM in their own inventory).
   canSend: { type: Boolean, default: false },
+  // Shows "move to shared inventory" (own personal item in a campaign).
+  canShare: { type: Boolean, default: false },
+  // Shows "take into my inventory" (item in the shared campaign inventory).
+  canTake: { type: Boolean, default: false },
 });
 
 const emit = defineEmits([
@@ -21,6 +25,8 @@ const emit = defineEmits([
   "open-item",
   "delete-item",
   "send-item",
+  "share-item",
+  "take-item",
   "seen-item",
 ]);
 
@@ -190,6 +196,20 @@ onUnmounted(clearHover);
               style="font-size: 1.1rem; color: #d9b44a"
               title="Send to players"
               @click="emit('send-item', slotProps.data)"
+            ></i>
+            <i
+              v-if="props.canShare"
+              class="pi pi-users cursor-pointer transition-transform hover:scale-125"
+              style="font-size: 1.1rem; color: #d9b44a"
+              title="Move to shared inventory"
+              @click="emit('share-item', slotProps.data)"
+            ></i>
+            <i
+              v-if="props.canTake"
+              class="pi pi-download cursor-pointer transition-transform hover:scale-125"
+              style="font-size: 1.1rem; color: #d9b44a"
+              title="Take into my inventory"
+              @click="emit('take-item', slotProps.data)"
             ></i>
             <i
               class="pi pi-trash cursor-pointer transition-transform hover:scale-125"

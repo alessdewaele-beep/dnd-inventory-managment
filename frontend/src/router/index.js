@@ -5,6 +5,7 @@ import InventoryPage from "@/features/inventory/pages/InventoryPage.vue";
 import RegisterPage from "@/features/auth/pages/RegisterPage.vue";
 import LoginPage from "@/features/auth/pages/LoginPage.vue";
 import ProfilePage from "@/features/profile/pages/ProfilePage.vue";
+import NotificationsPage from "@/features/notifications/pages/NotificationsPage.vue";
 import AdminPanelPage from "@/features/adminPanel/pages/AdminPanelPage.vue";
 import AdminDashboardPage from "@/features/adminPanel/pages/AdminDashboardPage.vue";
 import AdminUsersPage from "@/features/adminPanel/pages/AdminUsersPage.vue";
@@ -24,6 +25,12 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: ProfilePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/notifications",
+    name: "Notifications",
+    component: NotificationsPage,
     meta: { requiresAuth: true },
   },
   {

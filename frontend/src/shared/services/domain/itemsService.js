@@ -6,6 +6,7 @@ import UpdateItemUseCase from "@/features/inventory/useCases/UpdateItemUseCase";
 import DeleteItemUseCase from "@/features/inventory/useCases/DeleteItemUseCase";
 import SendItemUseCase from "@/features/inventory/useCases/SendItemUseCase";
 import MarkItemSeenUseCase from "@/features/inventory/useCases/MarkItemSeenUseCase";
+import MoveItemUseCase from "@/features/inventory/useCases/MoveItemUseCase";
 
 const repository = new ApiRepository();
 const getAllItemsByUserIdUseCase = new GetAllItemsByUserIdUseCase(repository);
@@ -14,6 +15,7 @@ const updateItemUseCase = new UpdateItemUseCase(repository);
 const deleteItemUseCase = new DeleteItemUseCase(repository);
 const sendItemUseCase = new SendItemUseCase(repository);
 const markItemSeenUseCase = new MarkItemSeenUseCase(repository);
+const moveItemUseCase = new MoveItemUseCase(repository);
 
 const state = reactive({
   items: [],
@@ -112,6 +114,20 @@ async function sendItem(item, recipientIds, quantity) {
   }
 }
 
+// Moves one of the user's own personal items into the campaign's shared
+// inventory. Returns true on success; the caller refreshes the shared list.
+async function moveToShared(item, userId) {
+  state.errorMessage = "";
+  try {
+    await moveItemUseCase.execute(item.id, "shared");
+    await fetchItems(userId);
+    return true;
+  } catch (err) {
+    state.errorMessage = err.message || "Could not share item";
+    return false;
+  }
+}
+
 // The owner hovers over a new item: remove the highlight immediately
 // (optimistically) and turn off the flag on the backend. On an error we set it
 // back, so the server remains the source of truth.
@@ -167,6 +183,7 @@ export const itemsService = {
   updateItem,
   deleteItem,
   sendItem,
+  moveToShared,
   markItemSeen,
   startPolling,
   stopPolling,

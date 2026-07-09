@@ -23,6 +23,17 @@ export default class ApiRepository extends DnDRepository {
     return Client.post(`items/${itemId}/send`, payload);
   }
 
+  // Shared (campaign-wide) inventory of the logged-in user's own campaign.
+  // Returns { campaignId, items }.
+  async getSharedInventory() {
+    return Client.getAll("items/shared");
+  }
+
+  // Move an item between personal and shared inventory ("shared" | "personal").
+  async moveItem(itemId, to) {
+    return Client.post(`items/${itemId}/move`, { to });
+  }
+
   // Owner has seen a new item: turn off the notification flag.
   async markItemSeen(itemId) {
     return Client.patch(`items/${itemId}/seen`, null, null);
@@ -104,5 +115,38 @@ export default class ApiRepository extends DnDRepository {
 
   async updateCurrency(userId, coins) {
     return Client.put("currencies", userId, coins);
+  }
+
+  // --- Shared party purse (own campaign) ---
+  // Returns { campaignId, currency }.
+  async getSharedCurrency() {
+    return Client.getAll("currencies/shared");
+  }
+
+  async updateSharedCurrency(coins) {
+    return Client.put("currencies", "shared", coins);
+  }
+
+  // Move coins between the personal purse and the party purse.
+  // Returns { personal, shared }.
+  async transferCurrency(direction, coins) {
+    return Client.post("currencies/transfer", { direction, coins });
+  }
+
+  // --- Notifications (own feed) ---
+  async getNotifications() {
+    return Client.getAll("notifications");
+  }
+
+  async getUnreadNotificationCount() {
+    return Client.getAll("notifications/unread-count");
+  }
+
+  async markNotificationRead(id) {
+    return Client.patch(`notifications/${id}/read`, null, null);
+  }
+
+  async markAllNotificationsRead() {
+    return Client.patch("notifications/read-all", null, null);
   }
 }

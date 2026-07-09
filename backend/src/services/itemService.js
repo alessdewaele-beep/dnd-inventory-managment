@@ -1,6 +1,7 @@
 const itemRepository = require("../repositories/itemRepository");
 const userRepository = require("../repositories/userRepository");
 const campaignRepository = require("../repositories/campaignRepository");
+const notificationService = require("./notificationService");
 
 class ItemService {
   getAllItems() {
@@ -28,11 +29,115 @@ class ItemService {
     return !!campaign && campaign.dungeon_master === requester.id;
   }
 
-  // `creator` is the logged-in user. If someone other than the owner adds
-  // the item (e.g. an admin), the owner receives a notification.
-  createItem(data, creator) {
+  // Resolves which campaign's shared inventory `requester` belongs to.
+  // The JWT does not carry the campaign, so it is looked up from the DB:
+  // a DM leads campaign(s) (first one wins), a player belongs to one via
+  // users.campaign_id. Returns null when there is no campaign context
+  // (e.g. an admin, or a player not assigned to a campaign yet).
+  async resolveMyCampaignId(requester) {
+    const led = await campaignRepository.getByDungeonMaster(requester.id);
+    if (led.length > 0) return led[0].id;
+
+    const user = await userRepository.findById(requester.id);
+    return user?.campaign_id ?? null;
+  }
+
+  // May `requester` view/modify the shared inventory of `campaignId`?
+  // Allowed for the Admin, the DM of that campaign, or any player member.
+  async canAccessCampaignInventory(requester, campaignId) {
+    if (requester.role === "Admin") return true;
+
+    const campaign = await campaignRepository.getById(campaignId);
+    if (!campaign) return false;
+    if (campaign.dungeon_master === requester.id) return true; // DM
+
+    const user = await userRepository.findById(requester.id);
+    return !!user && user.campaign_id === campaignId; // player member
+  }
+
+  // The shared inventory for the requester's own campaign, plus the resolved
+  // campaign id (null when the requester has no campaign context).
+  async getSharedInventory(requester) {
+    const campaignId = await this.resolveMyCampaignId(requester);
+    if (!campaignId) return { campaignId: null, items: [] };
+    const items = await itemRepository.getByCampaignId(campaignId);
+    return { campaignId, items };
+  }
+
+  // `creator` is the logged-in user. When `campaign_id` is present the item
+  // is added to that campaign's shared inventory (owned by no single player);
+  // otherwise it is a personal item. If someone other than the owner adds a
+  // personal item (e.g. an admin), the owner receives a notification.
+  async createItem(data, creator) {
+    if (data.campaign_id != null) {
+      const campaignId = Number(data.campaign_id);
+      const allowed = await this.canAccessCampaignInventory(creator, campaignId);
+      if (!allowed) return { error: "Insufficient permissions", status: 403 };
+      const item = await itemRepository.create({
+        ...data,
+        userId: null,
+        campaign_id: campaignId,
+        is_new: false,
+      });
+      // Shared inventory: tell every other campaign member about the addition.
+      await notificationService.notifySharedItemAdded(campaignId, creator, item.name);
+      return { item };
+    }
+
     const is_new = Number(data.userId) !== creator.id;
-    return itemRepository.create({ ...data, is_new });
+    const item = await itemRepository.create({
+      ...data,
+      campaign_id: null,
+      is_new,
+    });
+    // Someone other than the owner (admin/DM) added a personal item: notify.
+    if (is_new) {
+      await notificationService.notifyItemAdded(Number(data.userId), creator, item.name);
+    }
+    return { item };
+  }
+
+  // Moves an item between a player's personal inventory and their campaign's
+  // shared inventory. `to` is "shared" or "personal".
+  async moveItem(requester, itemId, to) {
+    const item = await itemRepository.getById(itemId);
+    if (!item) return { error: "Item not found", status: 404 };
+
+    if (to === "shared") {
+      // Only the owner may share one of their own personal items.
+      if (item.userId !== requester.id) {
+        return { error: "You can only share your own items", status: 403 };
+      }
+      const campaignId = await this.resolveMyCampaignId(requester);
+      if (!campaignId) {
+        return { error: "You are not part of a campaign", status: 400 };
+      }
+      const updated = await itemRepository.update(itemId, {
+        userId: null,
+        campaign_id: campaignId,
+        is_new: false,
+      });
+      return { item: updated };
+    }
+
+    if (to === "personal") {
+      if (!item.campaign_id) {
+        return { error: "Item is not in a shared inventory", status: 400 };
+      }
+      const allowed = await this.canAccessCampaignInventory(
+        requester,
+        item.campaign_id
+      );
+      if (!allowed) return { error: "Insufficient permissions", status: 403 };
+      const updated = await itemRepository.update(itemId, {
+        userId: requester.id,
+        campaign_id: null,
+        is_new: false,
+      });
+      return { item: updated };
+    }
+
+    return { error: "Invalid move target", status: 400 };
   }
 
   // The owner marks a new item as seen (hover in the inventory).
@@ -100,16 +205,31 @@ class ItemService {
         is_new: true, // recipient gets a notification in their inventory
       });
       created.push(item);
+      await notificationService.notifyItemAdded(userId, dm, item.name);
     }
     return { created };
   }
 
-  updateItem(id, data) {
-    return itemRepository.update(id, data);
+  // `actor` is the logged-in user. When someone other than the owner edits a
+  // personal item (a DM/admin), the owner is notified.
+  async updateItem(id, data, actor) {
+    const before = await itemRepository.getById(id);
+    const item = await itemRepository.update(id, data);
+    if (item && actor && item.userId != null && item.userId !== actor.id) {
+      await notificationService.notifyItemUpdated(item.userId, actor, item.name);
+    }
+    // `before` kept for symmetry / future diffing; the notification uses the
+    // updated name so a rename is reflected.
+    void before;
+    return item;
   }
 
-  deleteItem(id) {
-    return itemRepository.delete(id);
+  async deleteItem(id, actor) {
+    const item = await itemRepository.delete(id);
+    if (item && actor && item.userId != null && item.userId !== actor.id) {
+      await notificationService.notifyItemDeleted(item.userId, actor, item.name);
+    }
+    return item;
   }
 }
 
