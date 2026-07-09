@@ -131,7 +131,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div>
         <h2 class="font-serif text-2xl mb-1">Campaigns</h2>
         <p class="text-sm opacity-70">Manage campaigns, DMs and players.</p>
@@ -173,15 +173,27 @@ onMounted(() => {
         <div class="py-6 text-center opacity-60">No campaigns found.</div>
       </template>
 
-      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem" />
-      <p-column field="name" header="Name" sortable headerClass="dt-col-left" style="min-width: 9rem" />
+      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem">
+        <template #body="{ data }">
+          <span class="rt-label">ID</span>
+          <span>{{ data.id }}</span>
+        </template>
+      </p-column>
+      <p-column field="name" header="Name" sortable headerClass="dt-col-left" style="min-width: 9rem">
+        <template #body="{ data }">
+          <span class="rt-label">Name</span>
+          <span>{{ data.name }}</span>
+        </template>
+      </p-column>
       <p-column field="description" header="Description" headerClass="dt-col-left" style="min-width: 12rem">
         <template #body="{ data }">
+          <span class="rt-label">Description</span>
           <span class="opacity-80 line-clamp-2">{{ data.description || "—" }}</span>
         </template>
       </p-column>
       <p-column header="Dungeon master" headerClass="dt-col-left" style="min-width: 10rem">
         <template #body="{ data }">
+          <span class="rt-label">Dungeon master</span>
           <span v-if="data.dungeon_master" class="flex items-center gap-2">
             <i class="pi pi-user opacity-60"></i>{{ userMap[data.dungeon_master] || `#${data.dungeon_master}` }}
           </span>
@@ -190,11 +202,13 @@ onMounted(() => {
       </p-column>
       <p-column header="Players" style="width: 6rem; min-width: 6rem">
         <template #body="{ data }">
+          <span class="rt-label">Players</span>
           <p-tag :value="String(playerCount(data))" severity="secondary" />
         </template>
       </p-column>
       <p-column header="Actions" style="width: 13rem; min-width: 13rem">
         <template #body="{ data }">
+          <span class="rt-label">Actions</span>
           <div class="flex gap-2">
             <p-button icon="pi pi-pencil" size="small" severity="secondary" title="Edit" @click="openEdit(data)" />
             <p-button icon="pi pi-crown" size="small" severity="secondary" title="Assign DM" @click="openDm(data)" />

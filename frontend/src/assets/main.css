@@ -161,3 +161,88 @@ body {
 .my-confirmpopup:after {
   border-bottom-color: #d9b44a;
 }
+
+/* ===========================================================================
+   Responsive tables → cards on mobile
+   Below 640px every DataTable row (any table using .my-datatable) turns into a
+   stacked card. Each cell shows its column label (a `.rt-label` span injected
+   in that column's #body template) on the left and the value on the right.
+   From 640px up the labels are hidden and the normal table layout applies, so
+   the desktop rendering is unchanged.
+   =========================================================================== */
+.my-datatable .rt-label {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  /* The header row is replaced by per-cell labels. */
+  .my-datatable .p-datatable-thead {
+    display: none;
+  }
+
+  /* Let the table shrink to the viewport instead of forcing column min-widths
+     (which are what cause horizontal scrolling on phones). !important beats
+     PrimeVue's own display:table / min-width defaults. */
+  .my-datatable .p-datatable-table,
+  .my-datatable .p-datatable-tbody,
+  .my-datatable .p-datatable-tbody > tr {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Each row becomes a card. */
+  .my-datatable .p-datatable-tbody > tr {
+    margin: 0.6rem;
+    border: 1px solid rgba(217, 180, 74, 0.5);
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  /* Keep the "new item" golden accent on the card. */
+  .my-datatable .p-datatable-tbody > tr.row-new,
+  .my-datatable .p-datatable-tbody > tr.row-new:hover {
+    box-shadow: inset 3px 0 0 #d9b44a;
+  }
+
+  /* Each cell: label on the left, value on the right. */
+  .my-datatable .p-datatable-tbody > tr > td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
+    width: auto !important;
+    min-width: 0 !important;
+    text-align: right;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 0.6rem 0.9rem;
+  }
+
+  .dark .my-datatable .p-datatable-tbody > tr > td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .my-datatable .p-datatable-tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+
+  .my-datatable .rt-label {
+    display: inline-block;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    text-align: left;
+  }
+
+  /* Let the paginator wrap instead of overflowing on narrow screens. */
+  .my-datatable .p-paginator {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+    padding: 0.5rem;
+  }
+}

@@ -100,23 +100,39 @@ onMounted(() => {
         <div class="py-6 text-center opacity-60">No users found.</div>
       </template>
 
-      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem" />
-      <p-column field="username" header="Username" sortable headerClass="dt-col-left" style="min-width: 10rem" />
+      <p-column field="id" header="ID" sortable style="width: 5rem; min-width: 4rem">
+        <template #body="{ data }">
+          <span class="rt-label">ID</span>
+          <span>{{ data.id }}</span>
+        </template>
+      </p-column>
+      <p-column field="username" header="Username" sortable headerClass="dt-col-left" style="min-width: 10rem">
+        <template #body="{ data }">
+          <span class="rt-label">Username</span>
+          <span>{{ data.username }}</span>
+        </template>
+      </p-column>
       <p-column field="role" header="Role" sortable style="min-width: 7rem">
         <template #body="{ data }">
+          <span class="rt-label">Role</span>
           <p-tag :value="data.role" :severity="roleSeverity(data.role)" />
         </template>
       </p-column>
       <p-column header="Campaign" headerClass="dt-col-left" style="min-width: 9rem">
         <template #body="{ data }">
+          <span class="rt-label">Campaign</span>
           <span>{{ data.campaign_id ? (campaignMap[data.campaign_id] || `#${data.campaign_id}`) : "—" }}</span>
         </template>
       </p-column>
       <p-column field="created_at" header="Created" sortable style="min-width: 8rem">
-        <template #body="{ data }">{{ formatDate(data.created_at) }}</template>
+        <template #body="{ data }">
+          <span class="rt-label">Created</span>
+          <span>{{ formatDate(data.created_at) }}</span>
+        </template>
       </p-column>
       <p-column header="Actions" style="width: 8rem; min-width: 8rem">
         <template #body="{ data }">
+          <span class="rt-label">Actions</span>
           <div class="flex gap-2">
             <p-button
               icon="pi pi-trash"

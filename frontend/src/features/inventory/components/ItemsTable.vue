@@ -112,6 +112,7 @@ onUnmounted(clearHover);
 
       <p-column field="name" header="Name" headerClass="dt-col-left" style="width: 30%; min-width: 9rem">
         <template #body="slotProps">
+          <span class="rt-label">Item</span>
           <div class="flex items-center gap-3">
             <div
               class="flex items-center justify-center rounded-md border border-gold/60 overflow-hidden bg-ink/5 dark:bg-white/5 shrink-0"
@@ -143,6 +144,7 @@ onUnmounted(clearHover);
       </p-column>
       <p-column field="type" header="Type" headerClass="dt-col-left" style="width: 30%; min-width: 7rem">
         <template #body="slotProps">
+          <span class="rt-label">Type</span>
           <span
             class="inline-block rounded-full px-3 py-1 text-xs font-medium capitalize bg-ink/10 dark:bg-white/10"
             >{{ slotProps.data.type }}</span
@@ -151,11 +153,13 @@ onUnmounted(clearHover);
       </p-column>
       <p-column field="quantity" header="Qty." style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
+          <span class="rt-label">Qty.</span>
           <div class="text-center">{{ slotProps.data.quantity }}</div>
         </template>
       </p-column>
       <p-column field="favourite" header="Fav." style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
+          <span class="rt-label">Favourite</span>
           <div class="flex justify-center">
             <i
               :class="[
@@ -174,6 +178,7 @@ onUnmounted(clearHover);
       </p-column>
       <p-column header="Info" style="width: 10%; min-width: 4rem">
         <template #body="slotProps">
+          <span class="rt-label">Details</span>
           <div class="flex justify-center">
             <i
               @click="emit('open-item', slotProps.data)"
@@ -189,6 +194,7 @@ onUnmounted(clearHover);
         style="width: 12%; min-width: 5rem"
       >
         <template #body="slotProps">
+          <span class="rt-label">Actions</span>
           <div class="flex justify-center gap-4">
             <i
               v-if="props.canSend"

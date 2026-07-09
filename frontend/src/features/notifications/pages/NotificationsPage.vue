@@ -44,7 +44,7 @@ const onClickItem = (n) => {
       Back to inventory
     </button>
 
-    <div class="flex items-center justify-between gap-3 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h2 class="font-serif text-2xl flex items-center gap-2">
         <i class="pi pi-bell text-gold"></i> Notifications
       </h2>

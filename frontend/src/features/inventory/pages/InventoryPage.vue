@@ -326,7 +326,7 @@ watch(selectedUser, async (value) => {
        Only shown when the user actually belongs to a campaign. -->
   <div
     v-if="hasCampaign"
-    class="flex gap-2 max-w-6xl mx-auto px-4 pt-4"
+    class="flex flex-wrap gap-2 max-w-6xl mx-auto px-4 pt-4"
   >
     <button
       type="button"
