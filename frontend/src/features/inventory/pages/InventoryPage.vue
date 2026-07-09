@@ -38,6 +38,17 @@ const hasCampaign = computed(
   () => sharedInventoryService.state.campaignId != null
 );
 
+// Mobile: the two inventory views collapse behind a dropdown (like the admin
+// menu) instead of side-by-side tabs.
+const inventoryMenuOpen = ref(false);
+const activeTabLabel = computed(() =>
+  activeTab.value === "campaign" ? "Campaign inventory" : "My inventory"
+);
+const selectTab = (tab) => {
+  activeTab.value = tab;
+  inventoryMenuOpen.value = false;
+};
+
 // The DM chooses from their campaign players; an admin from all users.
 const viewableUsers = computed(() =>
   isAdmin ? usersService.state.users : usersService.state.campaignPlayers
@@ -324,26 +335,66 @@ watch(selectedUser, async (value) => {
 
   <!-- Tab switch between the personal and the shared campaign inventory.
        Only shown when the user actually belongs to a campaign. -->
-  <div
-    v-if="hasCampaign"
-    class="flex flex-wrap gap-2 max-w-6xl mx-auto px-4 pt-4"
-  >
-    <button
-      type="button"
-      class="inv-tab"
-      :class="{ 'inv-tab-active': activeTab === 'mine' }"
-      @click="activeTab = 'mine'"
-    >
-      My inventory
-    </button>
-    <button
-      type="button"
-      class="inv-tab"
-      :class="{ 'inv-tab-active': activeTab === 'campaign' }"
-      @click="activeTab = 'campaign'"
-    >
-      Campaign inventory
-    </button>
+  <div v-if="hasCampaign" class="max-w-6xl mx-auto px-4 pt-4">
+    <!-- Mobile: dropdown selector (collapses the two views). -->
+    <div class="sm:hidden">
+      <button
+        type="button"
+        @click="inventoryMenuOpen = !inventoryMenuOpen"
+        :aria-expanded="inventoryMenuOpen"
+        class="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-gold bg-gold/10 text-ink dark:text-ink-light font-serif font-semibold cursor-pointer"
+      >
+        <span class="flex items-center gap-2">
+          <i class="pi pi-box text-gold"></i>{{ activeTabLabel }}
+        </span>
+        <i :class="inventoryMenuOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+      </button>
+      <div
+        v-if="inventoryMenuOpen"
+        class="mt-1 flex flex-col rounded-lg border border-gold/50 overflow-hidden bg-parchment dark:bg-ink"
+      >
+        <button
+          type="button"
+          @click="selectTab('mine')"
+          :class="[
+            'px-4 py-2.5 text-left text-sm font-medium text-ink dark:text-ink-light',
+            activeTab === 'mine' ? 'bg-gold/30' : 'hover:bg-gold/15',
+          ]"
+        >
+          My inventory
+        </button>
+        <button
+          type="button"
+          @click="selectTab('campaign')"
+          :class="[
+            'px-4 py-2.5 text-left text-sm font-medium text-ink dark:text-ink-light',
+            activeTab === 'campaign' ? 'bg-gold/30' : 'hover:bg-gold/15',
+          ]"
+        >
+          Campaign inventory
+        </button>
+      </div>
+    </div>
+
+    <!-- Desktop: side-by-side tabs. -->
+    <div class="hidden sm:flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="inv-tab"
+        :class="{ 'inv-tab-active': activeTab === 'mine' }"
+        @click="activeTab = 'mine'"
+      >
+        My inventory
+      </button>
+      <button
+        type="button"
+        class="inv-tab"
+        :class="{ 'inv-tab-active': activeTab === 'campaign' }"
+        @click="activeTab = 'campaign'"
+      >
+        Campaign inventory
+      </button>
+    </div>
   </div>
 
   <!-- ===================== Personal inventory ===================== -->
