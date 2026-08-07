@@ -3,10 +3,12 @@ import { reactive, ref, onMounted } from "vue";
 import { authService } from "@/shared/services/domain/authService";
 import { hpService } from "@/shared/services/domain/hpService";
 import { useNavigation } from "@/shared/composables/useNavigation";
+import { useTheme } from "@/shared/composables/useTheme";
 import AppNavbar from "@/shared/components/AppNavbar.vue";
 import { useToast } from "primevue/usetoast";
 
 const { goLogin, goHome } = useNavigation();
+const { isDark } = useTheme();
 const toast = useToast();
 
 const userId = ref(null);
@@ -105,6 +107,27 @@ const cardClass =
         </p>
       </div>
     </div>
+
+    <!-- Appearance -->
+    <section :class="cardClass">
+      <h2
+        class="font-serif text-xl mb-4 text-ink dark:text-ink-light flex items-center gap-2"
+      >
+        <i class="pi pi-palette text-gold"></i> Appearance
+      </h2>
+
+      <label class="flex items-center justify-between gap-4 cursor-pointer">
+        <span class="flex flex-col">
+          <span class="text-sm font-medium text-ink dark:text-ink-light">
+            Dark mode
+          </span>
+          <span class="text-xs text-ink/60 dark:text-ink-light/60">
+            Applies immediately and is remembered on this device.
+          </span>
+        </span>
+        <p-toggleswitch v-model="isDark" />
+      </label>
+    </section>
 
     <!-- Hit points -->
     <section :class="cardClass">

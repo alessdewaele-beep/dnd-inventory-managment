@@ -73,6 +73,13 @@ async function setTempHp(userId, value) {
   return saveHp(userId, { ...state.hp, tempHp: Math.max(0, value || 0) });
 }
 
+// Sets the current HP directly (user-entered value), clamped to [0, maxHp] —
+// for big hits or heals that would take too many arrow clicks.
+async function setCurrentHp(userId, value) {
+  const currentHp = Math.min(state.hp.maxHp, Math.max(0, value || 0));
+  return saveHp(userId, { ...state.hp, currentHp });
+}
+
 export const hpService = {
   state,
   fetchHp,
@@ -80,4 +87,5 @@ export const hpService = {
   damage,
   heal,
   setTempHp,
+  setCurrentHp,
 };

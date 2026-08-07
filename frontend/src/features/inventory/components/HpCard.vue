@@ -8,18 +8,32 @@ const props = defineProps({
   readonly: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(["damage", "heal", "set-temp"]);
+const emit = defineEmits(["damage", "heal", "set-temp", "set-current"]);
 
-// Local copy of the temp HP field so typing is only sent when it changes.
+// Local copies of the editable fields so typing is only sent on change.
 const tempHp = ref(props.hp.tempHp ?? 0);
 watch(
   () => props.hp.tempHp,
   (value) => (tempHp.value = value ?? 0)
 );
 
+// Current HP is directly editable too, so a big hit (e.g. 20 damage) can be
+// typed in at once instead of clicking the arrow twenty times.
+const currentHp = ref(props.hp.currentHp ?? 0);
+watch(
+  () => props.hp.currentHp,
+  (value) => (currentHp.value = value ?? 0)
+);
+
 const saveTemp = () => {
   const value = Math.max(0, tempHp.value ?? 0);
   if (value !== (props.hp.tempHp ?? 0)) emit("set-temp", value);
+};
+
+const saveCurrent = () => {
+  const value = Math.min(props.hp.maxHp, Math.max(0, currentHp.value ?? 0));
+  currentHp.value = value;
+  if (value !== (props.hp.currentHp ?? 0)) emit("set-current", value);
 };
 
 const percentage = computed(() =>
@@ -64,8 +78,20 @@ const canHeal = computed(() => props.hp.currentHp < props.hp.maxHp);
             :style="{ width: percentage + '%', backgroundColor: barColor }"
           ></div>
         </div>
-        <span class="text-sm font-semibold whitespace-nowrap">
-          {{ hp.currentHp }} / {{ hp.maxHp }}
+        <span class="text-sm font-semibold whitespace-nowrap flex items-center gap-1">
+          <template v-if="readonly">{{ hp.currentHp }}</template>
+          <p-inputnumber
+            v-else
+            v-model="currentHp"
+            :min="0"
+            :max="hp.maxHp"
+            :max-fraction-digits="0"
+            :use-grouping="false"
+            inputClass="w-14 text-center !py-1"
+            @blur="saveCurrent"
+            @keydown.enter.prevent="saveCurrent"
+          />
+          / {{ hp.maxHp }}
           <span
             v-if="hp.tempHp > 0"
             class="ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold text-white bg-arcane dark:bg-forest"

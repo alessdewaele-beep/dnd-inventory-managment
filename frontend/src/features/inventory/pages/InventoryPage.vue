@@ -285,6 +285,10 @@ const setTempHp = async (value) => {
   if (!(await hpService.setTempHp(userId.value, value))) hpError();
 };
 
+const setCurrentHp = async (value) => {
+  if (!(await hpService.setCurrentHp(userId.value, value))) hpError();
+};
+
 // --- DM: send item to players ---
 const sendDialogVisible = ref(false);
 const itemToSend = ref(null);
@@ -456,6 +460,7 @@ watch(selectedUser, async (value) => {
         @damage="damageHp"
         @heal="healHp"
         @set-temp="setTempHp"
+        @set-current="setCurrentHp"
       />
       <CurrencyCard
         :currency="currencyService.state.currency"
