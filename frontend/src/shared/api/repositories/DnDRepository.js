@@ -119,6 +119,15 @@ export default class DnDRepository {
     throw new Error("method not implemented", direction);
   }
 
+  // --- Hit points ---
+  getHp(userId) {
+    throw new Error("method not implemented", userId);
+  }
+
+  updateHp(userId, hp) {
+    throw new Error("method not implemented", userId);
+  }
+
   // --- Notifications ---
   getNotifications() {
     throw new Error("method not implemented");

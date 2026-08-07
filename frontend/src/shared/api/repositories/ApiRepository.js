@@ -133,6 +133,16 @@ export default class ApiRepository extends DnDRepository {
     return Client.post("currencies/transfer", { direction, coins });
   }
 
+  // --- Hit points: a user's HP tracker ---
+  // Returns { enabled, maxHp, currentHp, tempHp }.
+  async getHp(userId) {
+    return Client.getAll(`hp/${userId}`);
+  }
+
+  async updateHp(userId, hp) {
+    return Client.put("hp", userId, hp);
+  }
+
   // --- Notifications (own feed) ---
   async getNotifications() {
     return Client.getAll("notifications");

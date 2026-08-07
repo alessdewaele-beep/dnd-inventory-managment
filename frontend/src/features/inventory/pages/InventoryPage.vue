@@ -5,6 +5,7 @@ import { authService } from "@/shared/services/domain/authService";
 import { itemsService } from "@/shared/services/domain/itemsService";
 import { sharedInventoryService } from "@/shared/services/domain/sharedInventoryService";
 import { currencyService } from "@/shared/services/domain/currencyService";
+import { hpService } from "@/shared/services/domain/hpService";
 import { usersService } from "@/shared/services/domain/usersService";
 import { useNavigation } from "@/shared/composables/useNavigation";
 import { useRightManager } from "@/shared/composables/useRightManager";
@@ -13,6 +14,7 @@ import ItemsTable from "@/features/inventory/components/ItemsTable.vue";
 import ItemFormDialog from "@/features/inventory/components/ItemFormDialog.vue";
 import SendItemDialog from "@/features/inventory/components/SendItemDialog.vue";
 import CurrencyCard from "@/features/inventory/components/CurrencyCard.vue";
+import HpCard from "@/features/inventory/components/HpCard.vue";
 import CurrencyTransferDialog from "@/features/inventory/components/CurrencyTransferDialog.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -261,6 +263,28 @@ const confirmTransfer = async ({ direction, coins }) => {
   }
 };
 
+// --- Hit points: quick -1/+1 arrows and the temp HP buffer of the
+// displayed player. Damage drains temp HP before real HP (D&D rules).
+const hpError = () =>
+  toast.add({
+    severity: "error",
+    summary: "Failed",
+    detail: hpService.state.errorMessage || "Could not update hit points",
+    life: 4000,
+  });
+
+const damageHp = async () => {
+  if (!(await hpService.damage(userId.value))) hpError();
+};
+
+const healHp = async () => {
+  if (!(await hpService.heal(userId.value))) hpError();
+};
+
+const setTempHp = async (value) => {
+  if (!(await hpService.setTempHp(userId.value, value))) hpError();
+};
+
 // --- DM: send item to players ---
 const sendDialogVisible = ref(false);
 const itemToSend = ref(null);
@@ -308,6 +332,7 @@ onMounted(async () => {
 
   await itemsService.fetchItems(userId.value);
   await currencyService.fetchCurrency(userId.value);
+  await hpService.fetchHp(userId.value);
   // Resolve and load the campaign's shared inventory + party purse (empty when
   // the user has no campaign; the tab stays hidden in that case).
   await sharedInventoryService.fetchShared();
@@ -326,6 +351,7 @@ watch(selectedUser, async (value) => {
   itemsService.selectFilterWord(""); // reset category filter on switch
   await itemsService.fetchItems(userId.value);
   await currencyService.fetchCurrency(userId.value);
+  await hpService.fetchHp(userId.value);
   itemsService.startPolling(userId.value);
 });
 </script>
@@ -421,6 +447,16 @@ watch(selectedUser, async (value) => {
     </div>
 
     <div class="max-w-6xl mx-auto px-4 pt-5 pb-10">
+      <!-- HP tracker: only when the displayed player enabled it in the
+           settings; read-only when a DM/admin is looking on. -->
+      <HpCard
+        v-if="hpService.state.hp.enabled"
+        :hp="hpService.state.hp"
+        :readonly="isViewingOther"
+        @damage="damageHp"
+        @heal="healHp"
+        @set-temp="setTempHp"
+      />
       <CurrencyCard
         :currency="currencyService.state.currency"
         @save="saveCurrency"

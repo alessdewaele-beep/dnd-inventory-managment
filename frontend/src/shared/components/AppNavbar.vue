@@ -92,6 +92,17 @@ const logOutAction = () => {
       </button>
 
       <button
+        v-if="authService.isLoggedIn()"
+        type="button"
+        @click="goTo('/settings')"
+        title="Settings"
+        aria-label="Settings"
+        class="h-9 w-9 flex items-center justify-center rounded-full border border-gold text-ink hover:bg-gold/20 transition-colors cursor-pointer dark:text-gold dark:hover:bg-white/10"
+      >
+        <i class="pi pi-cog"></i>
+      </button>
+
+      <button
         type="button"
         @click="toggleTheme"
         :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"

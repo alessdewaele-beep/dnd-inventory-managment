@@ -19,6 +19,21 @@ CREATE TABLE IF NOT EXISTS currencies (
     ON DELETE CASCADE
 );
 
+-- Hit point tracker per user (see migrations/2026-08-07_hp.sql).
+-- Opt-in (enabled); temp_hp absorbs damage before current_hp (D&D rules).
+CREATE TABLE IF NOT EXISTS user_hp (
+  user_id INT PRIMARY KEY,
+  enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  max_hp INT NOT NULL DEFAULT 10,
+  current_hp INT NOT NULL DEFAULT 10,
+  temp_hp INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user_hp_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
+
 -- Shared party purse: one row per campaign. The campaign_id FK
 -- (fk_campaign_currencies_campaign) is added in the matching migration,
 -- since the campaigns table is not defined in this (partial) schema file.

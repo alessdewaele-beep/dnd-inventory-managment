@@ -20,6 +20,7 @@ import Select from "primevue/select";
 import Textarea from "primevue/textarea";
 import Inputnumber from "primevue/inputnumber";
 import MultiSelect from "primevue/multiselect";
+import ToggleSwitch from "primevue/toggleswitch";
 import InputIcon from "primevue/inputicon";
 import IconField from "primevue/iconfield";
 import "./assets/main.css";
@@ -71,6 +72,7 @@ app.component("p-select", Select);
 app.component("p-textarea", Textarea);
 app.component("p-inputnumber", Inputnumber);
 app.component("p-multiselect", MultiSelect);
+app.component("p-toggleswitch", ToggleSwitch);
 app.component("p-inputIcon", InputIcon);
 app.component("p-iconField", IconField);
 
