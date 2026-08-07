@@ -5,11 +5,9 @@ import { profileService } from "@/shared/services/domain/profileService";
 import { notificationsService } from "@/shared/services/domain/notificationsService";
 import { useRightManager } from "@/shared/composables/useRightManager";
 import { useNavigation } from "@/shared/composables/useNavigation";
-import { useTheme } from "@/shared/composables/useTheme";
 
 const { hasRight } = useRightManager();
 const { goIfAllowed, goLogin, goTo } = useNavigation();
-const { isDark, toggleTheme } = useTheme();
 
 // Unread notification badge; capped at "9+" for layout.
 const unreadBadge = computed(() => {
@@ -100,15 +98,6 @@ const logOutAction = () => {
         class="h-9 w-9 flex items-center justify-center rounded-full border border-gold text-ink hover:bg-gold/20 transition-colors cursor-pointer dark:text-gold dark:hover:bg-white/10"
       >
         <i class="pi pi-cog"></i>
-      </button>
-
-      <button
-        type="button"
-        @click="toggleTheme"
-        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-        class="h-9 w-9 flex items-center justify-center rounded-full border border-gold text-ink hover:bg-gold/20 transition-colors cursor-pointer dark:text-gold dark:hover:bg-white/10"
-      >
-        <i :class="isDark ? 'pi pi-sun' : 'pi pi-moon'"></i>
       </button>
 
       <button
